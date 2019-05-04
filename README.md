@@ -6,9 +6,9 @@
 
 * Create VM of type: 'Standard E4 v3' (4 vcpus, 32 GB memory), VM of type 'E* v3' comes with HyperV supported
 
-[Installing docker on azure virtual machine windows 10](https://stackoverflow.com/questions/44817161/installing-docker-on-azure-virtual-machine-windows-10)
-
-[How to enable nested virtualization in Azure](https://rlevchenko.com/2017/07/24/how-to-enable-nested-virtualization-in-azure/)
+Reference Documents
+* [Installing docker on azure virtual machine windows 10](https://stackoverflow.com/questions/44817161/installing-docker-on-azure-virtual-machine-windows-10)
+* [How to enable nested virtualization in Azure](https://rlevchenko.com/2017/07/24/how-to-enable-nested-virtualization-in-azure/)
 
 ### VM Configuration
 
