@@ -1,8 +1,6 @@
 # Information about doing docker development using Visual Studio from an Azure VM
 
-# How to setup an Azure VM for Docker Development with Visual Studio
-
-## VM
+## Azure VM
 
 ### Creation
 
