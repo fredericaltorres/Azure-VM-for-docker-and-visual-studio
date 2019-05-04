@@ -114,3 +114,4 @@ https://fredcontainerregistry2.azurewebsites.net/
 
 ## Node Js app running in a container
 - [Download node js](https://nodejs.org/en/download/)
+- See sub folder fNodeAppInContainer [README](fNodeAppInContainer/README.md)
