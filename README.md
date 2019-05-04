@@ -112,3 +112,5 @@ docker run --rm -it -v ${PWD}:/api microsoft/dotnet:2-runtime # Should be able t
 - Use option to create registry from Visual Studio
 https://fredcontainerregistry2.azurewebsites.net/
 
+## Node Js app running in a container
+- [Download node js](https://nodejs.org/en/download/)

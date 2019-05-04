@@ -1,0 +1,13 @@
+{
+  "name": "fNodeAppInContainer",
+  "version": "1.0.0",
+  "description": "Fred Node.js App in a docker container",
+  "author": "Frederic Torres <fredericaltorres@gmail.com>",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.16.1"
+  }
+}
