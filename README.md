@@ -86,6 +86,7 @@ Output
     
     # How to get informaton about a docker image, used tool manifest-tool from weshigbee running in a container
     docker run --rm weshigbee/manifest-tool inspect microsoft/dotnet:2-runtime
+    docker run --rm weshigbee/manifest-tool inspect microsoft/dotnet:2.0.0-preview1-runtime-jessie
 ```
 
 ## Visual Studio and Git
