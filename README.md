@@ -83,6 +83,9 @@ Output
     # Download dotnet and query for info
     docker run --rm -it microsoft/dotnet:2-runtime dotnet --info
     docker inspect container-name
+    
+    # How to get informaton about a docker image, used tool manifest-tool from weshigbee running in a container
+    docker run --rm weshigbee/manifest-tool inspect microsoft/dotnet:2-runtime
 ```
 
 ## Visual Studio and Git
