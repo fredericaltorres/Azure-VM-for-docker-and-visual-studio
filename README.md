@@ -49,11 +49,14 @@ You will be asked to log out and log in.
 ```powershell
     C:\>docker version # Show the docker client side and server side
 ```
+Output
+```
         Client: Docker Engine - Community
         OS/Arch:           windows/amd64
         Experimental:      false
         Server: Docker Engine - Community
         OS/Arch:          linux/amd64
+```        
 
 ```powershell
     docker ps # Process
@@ -61,10 +64,14 @@ You will be asked to log out and log in.
 ```
 
 ```powershell
+    # Downloand and execute an Hello Word image
     # https://hub.docker.com/_/hello-world?tab=description
     docker pull library/hello-world # download an hello-world image container
     docker run library/hello-world # execute an hello-world image container
+    
     docker ps --all # Show history of container execution
+    
+    # Download ubuntu and execute a bash command
     docker run ubuntu /bin/bash -c "echo Hello World"
 
     # Run a container in background
@@ -73,6 +80,7 @@ You will be asked to log out and log in.
     docker exec helloworld "uname" # run command uname inside the running container which output the name of the OS
     docker stop helloworld # stop running container
 
+    # Download dotnet and query for info
     docker run --rm -it microsoft/dotnet:2-runtime dotnet --info
     docker inspect container-name
 ```
