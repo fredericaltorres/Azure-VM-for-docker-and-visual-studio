@@ -92,7 +92,7 @@ $myResourceGroup = "FredContainerRegistryResourceGroup"
 # az acr show --name $acrName --query loginServer --output table
 $acrLoginServer = "fredcontainerregistry.azurecr.io"
 # Tag image with the loginServer of your container registry. 
-$newVersionTag = "v2"
+$newVersionTag = "v3"
 $newTag = "$acrLoginServer/$imageTag`:$newVersionTag"
 $azureLoginName = $acrName
 $azurePassword = ""
@@ -107,7 +107,9 @@ $jsonContent = $jsonString | ConvertFrom-Json;
 $fqdn = $jsonContent.ipAddress.fqdn
 $ip = $jsonContent.ipAddress.ip
 $port = $jsonContent.ipAddress.ports.port
-$apiCallResult = Invoke-RestMethod -Method Get -Uri "http://$fqdn`:8080"
+$url = "http://$fqdn`:8080"
+write-host "url:$url"
+$apiCallResult = Invoke-RestMethod -Method Get -Uri $url
 "Api returned $apiCallResult"
 
 az container stop --resource-group $myResourceGroup --name $containeInstanceName
