@@ -1,15 +1,13 @@
 ﻿[CmdletBinding()]
 param(
     [Parameter(Mandatory=$false)]
-    [string]$action = "instantiate", # build, push, instantiate
+    [string]$action = "deleteInstantiate", # build, push, instantiate, deleteInstantiate
     [Parameter(Mandatory=$false)]
     [string]$imageTag = "fredericaltorres/fnodeappincontainer",
     [Parameter(Mandatory=$false)]
     [string]$containerVersionTag = "v3",
     [Parameter(Mandatory=$false)]
-    [string]$containerSourceCode = "C:\\dvt\\docker\\Azure-VM-for-docker-and-visual-studio\\fNodeAppInContainer",
-    [Parameter(Mandatory=$false)]
-    $containeInstanceName = "fnodeappincontainerinstance",
+    $containeInstanceName = "fnodeappincontainerinstance0",
 
     # Fred Azure Container Registry Information
     [Parameter(Mandatory=$false)]
@@ -39,28 +37,29 @@ param(
     #[string]$message = ""
 )
 
-function GetContainerInstanceIpFromJsonMetadata($jsonContent) {
+function GetContainerInstanceIpFromJsonMetadata($jsonString) {
 
+    $jsonContent = $jsonString | ConvertFrom-Json
     $fqdn = $jsonContent.ipAddress.fqdn
     $ip = $jsonContent.ipAddress.ip
     $port = $jsonContent.ipAddress.ports.port
     $url = "http://$fqdn`:8080"
-    write-host "url:$url"
-    return $url    
+    return $url
 }
 
 cls
 Write-Host "deployContainerToAzureContainerRegistry"
-cd $containerSourceCode
-
 $newTag = "$acrLoginServer/$imageTag`:$containerVersionTag"
+$containeInstanceName = $containeInstanceName.toLower()
 
 switch($action) {
 
+    # Build and publish the current container source code in the local docker image repository
     build { 
         Write-Host "Build imageTag:$imageTag"
         docker build -t $imageTag .
     }
+    # Tag the last image built of the container in the the local docker image repository and push into the Azure Container Registry
     push {
         write-host "Login to azure registry $acrName"
         az acr login --name $acrName # Log in to container registry
@@ -75,22 +74,29 @@ switch($action) {
         write-host "All version in azure registry for container $imageTag"
         az acr repository show-tags --name $acrName --repository $imageTag --output table
     }
+    # Using the versioned image in the Azure Container Registry, instanciate an instance of the container under a specific name
     instantiate {
-        $containeInstanceName = $containeInstanceName.toLower()
+        
         $azureLoginName = $acrName
-        $azurePassword = ""
+        $azurePassword = "/HMiRc"
         $dnsLabel="$($containeInstanceName)dns"
 
         write-host "About to instantiate instance of container $containeInstanceName from image $imageTag"
-        write-host "cmd: az container create --ports $containerInstancePort --os-type Linux  --name $containeInstanceName --image $newTag --cpu $containerInstanceCpu --memory $containerInstanceMemory --registry-login-server $acrLoginServer --registry-username $azureLoginName --registry-password '$azurePassword' --dns-name-label $dnsLabel --resource-group $myResourceGroup"
 
-        $jsonString = az container create --ports $containerInstancePort --os-type Linux  --name $containeInstanceName --image $newTag --cpu $containerInstanceCpu --memory $containerInstanceMemory --registry-login-server $acrLoginServer --registry-username $azureLoginName --registry-password '$azurePassword' --dns-name-label $dnsLabel --resource-group $myResourceGroup
+        $jsonString = az container create --resource-group $myResourceGroup --name $containeInstanceName --image $newTag --cpu $containerInstanceCpu --memory $containerInstanceMemory  --registry-login-server $acrLoginServer --registry-username $azureLoginName --registry-password $azurePassword  --ports $containerInstancePort --os-type Linux --dns-name-label $dnsLabel
 
-        $jsonContent = $jsonString | ConvertFrom-Json;
-        $url = GetContainerInstanceIpFromJsonMetadata $jsonContent
-        $apiCallResult = Invoke-RestMethod -Method Get -Uri $url
-        "Api returned $apiCallResult"
         
+        $url = GetContainerInstanceIpFromJsonMetadata $jsonString
+        Write-Host "Container Instance URL:$url"
+        $apiCallResult = Invoke-RestMethod -Method Get -Uri $url
+        "Api returned $apiCallResult"        
+    }
+    # Stop and delete an instance of the container under a specific name and version
+    deleteInstantiate {
+        write-host "About to stop container instance $containeInstanceName"
+        az container stop --resource-group $myResourceGroup --name $containeInstanceName
+        write-host "About to delete container instance $containeInstanceName"
+        az container delete --resource-group $myResourceGroup --name $containeInstanceName --yes
     }
 }
 

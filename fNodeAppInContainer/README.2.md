@@ -95,7 +95,7 @@ $acrLoginServer = "fredcontainerregistry.azurecr.io"
 $newVersionTag = "v3"
 $newTag = "$acrLoginServer/$imageTag`:$newVersionTag"
 $azureLoginName = $acrName
-$azurePassword = ""
+$azurePassword = "/HMiRc"
 $containeInstanceName = "$($imageTag)Instance".replace("fredericaltorres/","").ToLower()
 $dnsLabel="$($containeInstanceName)dns"
 
@@ -113,8 +113,9 @@ $apiCallResult = Invoke-RestMethod -Method Get -Uri $url
 "Api returned $apiCallResult"
 
 az container stop --resource-group $myResourceGroup --name $containeInstanceName
-az container start --resource-group $myResourceGroup --name $containeInstanceName
 az container delete --resource-group $myResourceGroup --name $containeInstanceName --yes
+az container start --resource-group $myResourceGroup --name $containeInstanceName
+
 $jsonString = az container list --resource-group $myResourceGroup
 $jsonString = az container show --resource-group $myResourceGroup --name $containeInstanceName
 az container logs --resource-group $myResourceGroup --name $containeInstanceName
