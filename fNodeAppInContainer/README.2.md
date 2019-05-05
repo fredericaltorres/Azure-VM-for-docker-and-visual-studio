@@ -5,6 +5,8 @@
 ```powershell
 $imageTag = "fredericaltorres/fnodeappincontainer"
 docker build -t $imageTag .
+# v1 - 335ee5d7fd6d
+# v2 - 108e34bf4435 
 docker images $imageTag
 ```
 
@@ -13,13 +15,13 @@ docker images $imageTag
 ```powershell
 $imageTag = "fredericaltorres/fnodeappincontainer"
 docker run -p 49160:8080 -d $imageTag
-3474e4f9c8738ec1fe37f5a164e09e01e0c8e9c1bfbcd4f1ba2a61d7e9cf97dd
+62c7c40a511abef37735709400fafd414c6e5561d57897046b17eec067bf5d40
 
 docker ps # Get container ID
 
-docker logs 3474e4f9c873    # Print app output
+docker logs 62c7c40a511abef37735709400fafd414c6e5561d57897046b17eec067bf5d40    # Print app output
 
-$ docker exec -it 3474e4f9c873 /bin/bash # Enter the container
+docker exec -it 62c7c40a511abef37735709400fafd414c6e5561d57897046b17eec067bf5d40 /bin/bash # Enter the container
 
 ```
 
@@ -38,7 +40,7 @@ docker ps $imageTag .
 ```powershell
 $imageTag = "fredericaltorres/fnodeappincontainer"
 docker stop $imageTag # stop running container
-docker stop 3474e4f9c873
+docker stop 62c7c40a511abef37735709400fafd414c6e5561d57897046b17eec067bf5d40
 ```
 
 ## How to deploy the container in the cloud
@@ -52,29 +54,23 @@ First, we will create an Azure container registry and push our container image
 
 ```powershell
 az login # if you never logged in
-$myResourceGroup = "FredContainerRegistryResourceGroup"
-az group create --name $myResourceGroup --location eastus
 
-# Create an Azure container registry -- SKU BASIC $61 / year
-# 
-$acrName = "FredContainerRegistry"
-az acr create --resource-group  $myResourceGroup --name $acrName --sku Basic --admin-enabled true
-
-# Log in to container registry
-az acr login --name $acrName
-
-# Get the full login server name for your Azure container registry. 
-az acr show --name $acrName --query loginServer --output table
-$acrLoginServer = "fredcontainerregistry.azurecr.io"
 $imageTag = "fredericaltorres/fnodeappincontainer"
-
+# Consider that the Azure Container `FredContainerRegistry` already exist
+$acrName = "FredContainerRegistry"
+$myResourceGroup = "FredContainerRegistryResourceGroup"
+az acr login --name $acrName # Log in to container registry
+# Get the full login server name for your Azure container registry. 
+# az acr show --name $acrName --query loginServer --output table
+$acrLoginServer = "fredcontainerregistry.azurecr.io"
 # Tag image with the loginServer of your container registry. 
-$newTag = "$acrLoginServer/$imageTag`:v1"
-docker tag $imageTag $newTag 
+$newVersionTag = "v2"
+$newTag = "$acrLoginServer/$imageTag`:$newVersionTag"
 
+docker tag $imageTag $newTag 
+docker images
 # Push tagged image to registry
 docker push $newTag
-
 
 # List images in Azure Container Registry
 az acr repository list --name $acrName --output table
@@ -87,13 +83,17 @@ az acr repository show-tags --name $acrName --repository $imageTag --output tabl
 ## Tutorial: Deploy a container application to Azure Container Instances
 
 ```powershell
-# Get the full login server name for your Azure container registry. 
-$myResourceGroup = "FredContainerRegistryResourceGroup"
-$acrName = "FredContainerRegistry"
 $imageTag = "fredericaltorres/fnodeappincontainer"
-#az acr show --name $acrName --query loginServer --output table
+# Consider that the Azure Container `FredContainerRegistry` already exist
+$acrName = "FredContainerRegistry"
+$myResourceGroup = "FredContainerRegistryResourceGroup"
+#az acr login --name $acrName # Log in to container registry
+# Get the full login server name for your Azure container registry. 
+# az acr show --name $acrName --query loginServer --output table
 $acrLoginServer = "fredcontainerregistry.azurecr.io"
-$newTag = "$acrLoginServer/$imageTag`:v1"
+# Tag image with the loginServer of your container registry. 
+$newVersionTag = "v2"
+$newTag = "$acrLoginServer/$imageTag`:$newVersionTag"
 $azureLoginName = $acrName
 $azurePassword = ""
 $containeInstanceName = "$($imageTag)Instance".replace("fredericaltorres/","").ToLower()
