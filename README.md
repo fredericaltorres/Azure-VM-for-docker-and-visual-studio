@@ -61,34 +61,34 @@ OS/Arch:          linux/amd64
 ```        
 
 ```powershell
-    C:\>docker ps # Process
-    C:\>docker images # images
+C:\>docker ps # Process
+C:\>docker images # images
 ```
 
 ```powershell
-    # Download and execute an Hello Word image
-    # https://hub.docker.com/_/hello-world?tab=description
-    C:\>docker pull library/hello-world # download an hello-world image container
-    C:\>docker run library/hello-world # execute an hello-world image container
-    
-    C:\>docker ps --all # Show history of container execution
-    
-    # Download ubuntu and execute a bash command
-    C:\>docker run ubuntu /bin/bash -c "echo Hello World"
+# Download and execute an Hello Word image
+# https://hub.docker.com/_/hello-world?tab=description
+C:\>docker pull library/hello-world # download an hello-world image container
+C:\>docker run library/hello-world # execute an hello-world image container
 
-    # Run a container in background
-    C:\>docker run --detach --name helloworld  ubuntu /bin/bash -c "while true; do echo Hello World; sleep 1; done"
-    C:\>docker logs helloworld # see the output of the container
-    C:\>docker exec helloworld "uname" # run command uname inside the running container which output the name of the OS
-    docker stop helloworld # stop running container
+C:\>docker ps --all # Show history of container execution
 
-    # Download dotnet and query for info
-    C:\>docker run --rm -it microsoft/C:\>dotnet:2-runtime dotnet --info
-    C:\>docker inspect container-name
-    
-    # How to get informaton about a docker image, used tool manifest-tool from weshigbee running in a container
-    C:\>docker run --rm weshigbee/manifest-tool inspect microsoft/dotnet:2-runtime
-    C:\>docker run --rm weshigbee/manifest-tool inspect microsoft/dotnet:2.0.0-preview1-runtime-jessie
+# Download ubuntu and execute a bash command
+C:\>docker run ubuntu /bin/bash -c "echo Hello World"
+
+# Run a container in background
+C:\>docker run --detach --name helloworld  ubuntu /bin/bash -c "while true; do echo Hello World; sleep 1; done"
+C:\>docker logs helloworld # see the output of the container
+C:\>docker exec helloworld "uname" # run command uname inside the running container which output the name of the OS
+docker stop helloworld # stop running container
+
+# Download dotnet and query for info
+C:\>docker run --rm -it microsoft/C:\>dotnet:2-runtime dotnet --info
+C:\>docker inspect container-name
+
+# How to get informaton about a docker image, used tool manifest-tool from weshigbee running in a container
+C:\>docker run --rm weshigbee/manifest-tool inspect microsoft/dotnet:2-runtime
+C:\>docker run --rm weshigbee/manifest-tool inspect microsoft/dotnet:2.0.0-preview1-runtime-jessie
 ```
 
 ## How to build, test, publish and instanciate a container image based on a NodeJS app in Azure
