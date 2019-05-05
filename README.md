@@ -1,20 +1,20 @@
-# Information about doing docker development using Visual Studio from an Azure VM
+# Information about doing docker container development using Visual Studio and NodeJS from an Azure VM
 
 ## Azure VM
+First we need a machine, you may install docker on our physical machine, but you can also provision an Azure VM, which is what we are doing here.
 
 ### Creation
 
-* Create VM of type: 'Standard E4 v3' (4 vcpus, 32 GB memory), VM of type 'E* v3' comes with HyperV supported
+* Create VM of type: 'Standard E4 v3' (4 vcpus, 32 GB memory), VM of type 'E* v3' comes with HyperV supported.
 
 Reference Documents
 * [Installing docker on azure virtual machine windows 10](https://stackoverflow.com/questions/44817161/installing-docker-on-azure-virtual-machine-windows-10)
 * [How to enable nested virtualization in Azure](https://rlevchenko.com/2017/07/24/how-to-enable-nested-virtualization-in-azure/)
 
 ### VM Configuration
+Once the VM is running connect via RDP and execute the following PowerShell commands.
 
-VM Configuration with PowerShell
 ```PowerShell
- 
 # Step 1 - Ensure Windows Hyper-V featutes are enabled by running PowerShell cmdlet:
 Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V -All -Verbose
 # You should be asked to reboot.
@@ -22,7 +22,7 @@ Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V -All -Verbo
 # Step 2 - Ensure Windows Containers feature is enabled by running PowerShell cmdlet:
 Enable-WindowsOptionalFeature -Online -FeatureName Containers -All -Verbose
 
-#Ensure Hypervisor is set to auto start in the Boot Configuration Database (BCD) by running in elevated command prompt the command:
+# Step 3 - Ensure Hypervisor is set to auto start in the Boot Configuration Database (BCD) by running in elevated command prompt the command:
 bcdedit /set hypervisorlaunchtype Auto
 
 # Reboot
@@ -40,6 +40,7 @@ You will be asked to log out and log in.
 
 #### Hyper V Manager
 - Start Hyper-V Manager. You should see the MobyLinuxVM running inside.
+- We can increase the memory allocated to the MobyLinuxVM using the Hyper-V Manager UI.
 
 #### Docker account
     - Create an account http://hub.docker.com
@@ -49,45 +50,51 @@ You will be asked to log out and log in.
 ```powershell
     C:\>docker version # Show the docker client side and server side
 ```
-Output
+We expect the client side to be Windows and the server side to be Linux.
+**Output**
 ```
-        Client: Docker Engine - Community
-        OS/Arch:           windows/amd64
-        Experimental:      false
-        Server: Docker Engine - Community
-        OS/Arch:          linux/amd64
+Client: Docker Engine - Community
+OS/Arch:           windows/amd64
+Experimental:      false
+Server: Docker Engine - Community
+OS/Arch:          linux/amd64
 ```        
 
 ```powershell
-    docker ps # Process
-    docker images # images
+    C:\>docker ps # Process
+    C:\>docker images # images
 ```
 
 ```powershell
-    # Downloand and execute an Hello Word image
+    # Download and execute an Hello Word image
     # https://hub.docker.com/_/hello-world?tab=description
-    docker pull library/hello-world # download an hello-world image container
-    docker run library/hello-world # execute an hello-world image container
+    C:\>docker pull library/hello-world # download an hello-world image container
+    C:\>docker run library/hello-world # execute an hello-world image container
     
-    docker ps --all # Show history of container execution
+    C:\>docker ps --all # Show history of container execution
     
     # Download ubuntu and execute a bash command
-    docker run ubuntu /bin/bash -c "echo Hello World"
+    C:\>docker run ubuntu /bin/bash -c "echo Hello World"
 
     # Run a container in background
-    docker run --detach --name helloworld  ubuntu /bin/bash -c "while true; do echo Hello World; sleep 1; done"
-    docker logs helloworld # see the output of the container
-    docker exec helloworld "uname" # run command uname inside the running container which output the name of the OS
+    C:\>docker run --detach --name helloworld  ubuntu /bin/bash -c "while true; do echo Hello World; sleep 1; done"
+    C:\>docker logs helloworld # see the output of the container
+    C:\>docker exec helloworld "uname" # run command uname inside the running container which output the name of the OS
     docker stop helloworld # stop running container
 
     # Download dotnet and query for info
-    docker run --rm -it microsoft/dotnet:2-runtime dotnet --info
-    docker inspect container-name
+    C:\>docker run --rm -it microsoft/C:\>dotnet:2-runtime dotnet --info
+    C:\>docker inspect container-name
     
     # How to get informaton about a docker image, used tool manifest-tool from weshigbee running in a container
-    docker run --rm weshigbee/manifest-tool inspect microsoft/dotnet:2-runtime
-    docker run --rm weshigbee/manifest-tool inspect microsoft/dotnet:2.0.0-preview1-runtime-jessie
+    C:\>docker run --rm weshigbee/manifest-tool inspect microsoft/dotnet:2-runtime
+    C:\>docker run --rm weshigbee/manifest-tool inspect microsoft/dotnet:2.0.0-preview1-runtime-jessie
 ```
+
+## How to build, test, publish and instanciate a container image based on a NodeJS app in Azure
+- [Download node js](https://nodejs.org/en/download/)
+- The sub folder fNodeAppInContainer, contains a NodeJS REST API application, that be containerized, published to an Azure Container Registry, and instanciate multple time int the cloud using a PowerShell Script. 
+- [README](fNodeAppInContainer/README.md)
 
 ## Visual Studio and Git
 
@@ -102,16 +109,9 @@ Output
 
 ```powershell
 dotnet run # will compile and run the app from the command line
-docker run --rm -it microsoft/dotnet:2-runtime
-docker run --rm -it microsoft/aspnetcore:2
-docker run --rm -it -v ${PWD}:/api microsoft/dotnet:2-runtime # Should be able to mount the source code inside 
 ```
 
 ### Publish to Azure Container Registry
-- name:fredcontainerregistry2,
-- Use option to create registry from Visual Studio
-https://fredcontainerregistry2.azurewebsites.net/
 
-## Node Js app running in a container
-- [Download node js](https://nodejs.org/en/download/)
-- See sub folder fNodeAppInContainer [README](fNodeAppInContainer/README.md)
+***` - - - Not finished - - - `***
+
