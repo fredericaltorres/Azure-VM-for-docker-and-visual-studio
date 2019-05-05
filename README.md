@@ -61,31 +61,43 @@ OS/Arch:          linux/amd64
 ```        
 
 ```powershell
-C:\>docker ps # Process
-C:\>docker images # images
+C:\>docker ps # At this point to container process should be running
+C:\>docker images ps # At this point to the contains repository should be enpty
 ```
 
+- Let's download and execute an Hello World image
+- For more information about the [Hello World Image](https://hub.docker.com/_/hello-world?tab=description)
 ```powershell
-# Download and execute an Hello Word image
-# https://hub.docker.com/_/hello-world?tab=description
-C:\>docker pull library/hello-world # download an hello-world image container
-C:\>docker run library/hello-world # execute an hello-world image container
-
+# Download from hub.docker.com as a default
+C:\>docker pull library/hello-world 
+C:\>docker run library/hello-world # execute 
 C:\>docker ps --all # Show history of container execution
+```
 
+- Let's download a small version of Ubuntu
+- Run the OS and execute a bash command
+```powershell
 # Download ubuntu and execute a bash command
 C:\>docker run ubuntu /bin/bash -c "echo Hello World"
+```
 
-# Run a container in background
+- Run the container in background mode, detached from the console
+
+```powershell
 C:\>docker run --detach --name helloworld  ubuntu /bin/bash -c "while true; do echo Hello World; sleep 1; done"
 C:\>docker logs helloworld # see the output of the container
 C:\>docker exec helloworld "uname" # run command uname inside the running container which output the name of the OS
 docker stop helloworld # stop running container
+```
 
-# Download dotnet and query for info
+- download the dotnet runtime and query for information
+```powershell
 C:\>docker run --rm -it microsoft/C:\>dotnet:2-runtime dotnet --info
-C:\>docker inspect container-name
+```
 
+- How to visualize information about a container image using the inspect tool?
+
+```powershell
 # How to get informaton about a docker image, used tool manifest-tool from weshigbee running in a container
 C:\>docker run --rm weshigbee/manifest-tool inspect microsoft/dotnet:2-runtime
 C:\>docker run --rm weshigbee/manifest-tool inspect microsoft/dotnet:2.0.0-preview1-runtime-jessie
