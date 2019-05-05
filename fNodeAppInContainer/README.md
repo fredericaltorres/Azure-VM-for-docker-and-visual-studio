@@ -1,6 +1,30 @@
-# Fred Node App In Container
+# How to build, test, publish and instance a container image using a NodeJS + express App on Azure
 
-## How to build the container
+## Overview
+
+- Here are the manual steps to create an instance of a container located in an Azure Container Registry
+- The powerShell script deployContainerToAzureContainerRegistry.ps1 located in the same folder allow to
+    * build an image
+    * Tag and push an image to the Azure Container Registry
+    * Instanciate a container instance from an image located in the Azure Container Registry
+
+**REST API**
+
+The NodeJS application implement the following REST API
+
+```powershell
+http://localhost:8080 # Return greeting and help in html
+http://localhost:8080/api/items # Return a list of item in JSON
+http://localhost:8080/api/items/1 # Return item 1 in JSON
+http://localhost:8080/api/items/2 # Return item 1 in JSON
+```
+
+## How to build and test the container locally?
+
+### How to build the container?
+The build command will take the current source code,
+build an image and register it into the local docker
+repository under a new image id (checksum)
 
 ```powershell
 $imageTag = "fredericaltorres/fnodeappincontainer"
@@ -10,44 +34,49 @@ docker build -t $imageTag .
 docker images $imageTag
 ```
 
-## How to run the image
+### How to run the image?
+- Once the image is built and registered in the local docker image repository. We can create a container instance locally
+and use it. 
+- We will need to find the port used on the physical machine mapped to 8080.
+- We can view the main log produced by the container instance
+- We can also connect into the container instance itself
+
+**Powershell Code**
 
 ```powershell
 $imageTag = "fredericaltorres/fnodeappincontainer"
+docker ps $imageTag . # Get the physical port map to 8080 in the container -> 49160
 docker run -p 49160:8080 -d $imageTag
-62c7c40a511abef37735709400fafd414c6e5561d57897046b17eec067bf5d40
-
-docker ps # Get container ID
-
-docker logs 62c7c40a511abef37735709400fafd414c6e5561d57897046b17eec067bf5d40    # Print app output
-docker exec -it 62c7c40a511abef37735709400fafd414c6e5561d57897046b17eec067bf5d40 /bin/bash # Enter the container
-```
-
-## how to test the container image locally
-To test your app, get the port of your app that Docker mapped:
-
-```powershell
-$imageTag = "fredericaltorres/fnodeappincontainer"
-docker ps $imageTag .
-# Get the physical port map to 8080 in the container -> 49160
 
 # Try this url: http://localhost:49160
+
+# Enter the container using a bash console
+docker ps # Get container ID
+docker exec -it 62c7c40a51 /bin/bash 
 ```
 
-## How to stop the container
+### How to stop the container?
 ```powershell
 $imageTag = "fredericaltorres/fnodeappincontainer"
 docker stop $imageTag # stop running container
-docker stop 62c7c40a511abef37735709400fafd414c6e5561d57897046b17eec067bf5d40
+docker stop 62c7c40a51
 ```
 
-## How to deploy the container in the cloud
+## How to deploy the container in the Azure?
+- First we must publish or push the container image into an Registry (Azure Container Registry).
+- Frm the registry we can create multiple instance of the container image
+
 Let's consider that the Azure Container Registry `FredContainerRegistry` already exist.
+
+**Reference Links**
 
 - [Install Install the Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest)
 - [Tutorial: Deploy an Azure container registry and push a container image](https://docs.microsoft.com/en-us/azure/container-instances/container-instances-tutorial-prepare-acr)
 - [Azure container registry pricing](https://azure.microsoft.com/en-us/pricing/details/container-registry/)
 
+### Tag and publish a container image into an Azure Container Registry
+
+**Powershell Code**
 
 ```powershell
 az login # if you never logged in
@@ -56,50 +85,56 @@ $imageTag = "fredericaltorres/fnodeappincontainer"
 # Consider that the Azure Container `FredContainerRegistry` already exist
 $acrName = "FredContainerRegistry"
 $myResourceGroup = "FredContainerRegistryResourceGroup"
-az acr login --name $acrName # Log in to container registry
+
 # Get the full login server name for your Azure container registry. 
 # az acr show --name $acrName --query loginServer --output table
 $acrLoginServer = "fredcontainerregistry.azurecr.io"
-# Tag image with the loginServer of your container registry. 
-$newVersionTag = "v2"
-$newTag = "$acrLoginServer/$imageTag`:$newVersionTag"
 
-docker tag $imageTag $newTag 
-docker images
-# Push tagged image to registry
-docker push $newTag
+# With Azure Container Registry, each image pushed must be tagged according a special format
+# [1-AzureContainerRegistryLoginServerName] / RegularImageTagName : Version
+$newVersionTag = "v2" # << This is the new version
+$newTag = "$acrLoginServer/$imageTag`:$newVersionTag" # Create a new tag with the special format
 
-# List images in Azure Container Registry
-az acr repository list --name $acrName --output table
+docker tag $imageTag $newTag # Tag the image locally
+docker images # Look at the result
 
-# To see the tags version for a specific image, 
-az acr repository show-tags --name $acrName --repository $imageTag --output table
+az acr login --name $acrName # Log in into the Azure Container Registry
+docker push $newTag # Push tagged image to Azure Container Registry which we are currently logged in
 
+az acr repository list --name $acrName --output table # List images in Azure Container Registry
+
+az acr repository show-tags --name $acrName --repository $imageTag --output table # List all the tags version for a specific image in the Azure Container Registry
 ```
 
-## Tutorial: Deploy a container application to Azure Container Instances
+### Instantiate a container instance from an image located into an Azure Container Registry
+
+**Powershell Code**
 
 ```powershell
 $imageTag = "fredericaltorres/fnodeappincontainer"
 # Consider that the Azure Container `FredContainerRegistry` already exist
 $acrName = "FredContainerRegistry"
 $myResourceGroup = "FredContainerRegistryResourceGroup"
-#az acr login --name $acrName # Log in to container registry
+
 # Get the full login server name for your Azure container registry. 
 # az acr show --name $acrName --query loginServer --output table
-$acrLoginServer = "fredcontainerregistry.azurecr.io"
+$acrLoginServer = "fredcontainerregistry.azurecr.io" # In the portal see section Access Keys on the left, resource FredContainerRegistry
 # Tag image with the loginServer of your container registry. 
 $newVersionTag = "v3"
 $newTag = "$acrLoginServer/$imageTag`:$newVersionTag"
-$azureLoginName = $acrName
-$azurePassword = "/HMiRc"
-$containeInstanceName = "$($imageTag)Instance".replace("fredericaltorres/","").ToLower()
-$dnsLabel="$($containeInstanceName)dns"
+$azureLoginName = $acrName  # In the portal see section Access Keys on the left, resource FredContainerRegistry
+$azurePassword = "/HMiRc"  # In the portal see section Access Keys on the left, resource FredContainerRegistry
+$containeInstanceName = "fnodeappincontainer" # Use the name of the image without my name as prefix
+$dnsLabel="$containeInstanceName"
 
 # az container xxxxx -> https://docs.microsoft.com/en-us/cli/azure/container?view=azure-cli-latest#az-container-delete
 
+az acr login --name $acrName # Log in to container registry
+
+# Create a container instance from the image tagged and located in the  Azure container registry.
 $jsonString = az container create --resource-group $myResourceGroup --name $containeInstanceName --image $newTag --cpu 1 --memory 1 --registry-login-server $acrLoginServer --registry-username $azureLoginName --registry-password $azurePassword  --ports 8080 --os-type Linux --dns-name-label $dnsLabel
 
+# From the json data returned by az container create, build the nodejs server url and call the url
 $jsonContent = $jsonString | ConvertFrom-Json;
 $fqdn = $jsonContent.ipAddress.fqdn
 $ip = $jsonContent.ipAddress.ip
@@ -109,10 +144,10 @@ write-host "url:$url"
 $apiCallResult = Invoke-RestMethod -Method Get -Uri $url
 "Api returned $apiCallResult"
 
+# Other commands to manager container instance
 az container stop --resource-group $myResourceGroup --name $containeInstanceName
 az container delete --resource-group $myResourceGroup --name $containeInstanceName --yes
 az container start --resource-group $myResourceGroup --name $containeInstanceName
-
 $jsonString = az container list --resource-group $myResourceGroup
 $jsonString = az container show --resource-group $myResourceGroup --name $containeInstanceName
 az container logs --resource-group $myResourceGroup --name $containeInstanceName
@@ -120,50 +155,3 @@ az container exec --resource-group $myResourceGroup --name $containeInstanceName
 
 ```
 
-<#
-
-  {list,create,show,delete,logs,exec,export,attach,restart,stop,start}
-
-usage: az container create [-h] [--verbose] [--debug]
-                           [--output {json,jsonc,table,tsv,yaml,none}]
-                           [--query JMESPATH] --resource-group
-                           RESOURCE_GROUP_NAME [--name NAME] [--image IMAGE]
-                           [--location LOCATION] [--cpu CPU] [--memory MEMORY]
-                           [--restart-policy {Always,OnFailure,Never}]
-                           [--ports PORTS [PORTS ...]] [--protocol {TCP,UDP}]
-                           [--os-type {Windows,Linux}]
-                           [--ip-address {Public,Private}]
-                           [--dns-name-label DNS_NAME_LABEL]
-                           [--command-line COMMAND_LINE]
-                           [--environment-variables ENVIRONMENT_VARIABLES [ENVIRONMENT_VARIABLES ...]]
-                           [--secure-environment-variables SECURE_ENVIRONMENT_VARIABLES [SECURE_ENVIRONMENT_VARIABLES ...]]
-                           [--registry-login-server REGISTRY_LOGIN_SERVER]
-                           [--registry-username REGISTRY_USERNAME]
-                           [--registry-password REGISTRY_PASSWORD]
-                           [--azure-file-volume-share-name AZURE_FILE_VOLUME_SHARE_NAME]
-                           [--azure-file-volume-account-name AZURE_FILE_VOLUME_ACCOUNT_NAME]
-                           [--azure-file-volume-account-key AZURE_FILE_VOLUME_ACCOUNT_KEY]
-                           [--azure-file-volume-mount-path AZURE_FILE_VOLUME_MOUNT_PATH]
-                           [--log-analytics-workspace LOG_ANALYTICS_WORKSPACE]
-                           [--log-analytics-workspace-key LOG_ANALYTICS_WORKSPACE_KEY]
-                           [--vnet VNET] [--vnet-name VNET_NAME]
-                           [--vnet-address-prefix VNET_ADDRESS_PREFIX]
-                           [--subnet SUBNET]
-                           [--subnet-address-prefix SUBNET_ADDRESS_PREFIX]
-                           [--network-profile NETWORK_PROFILE]
-                           [--gitrepo-url GITREPO_URL]
-                           [--gitrepo-dir GITREPO_DIR]
-                           [--gitrepo-revision GITREPO_REVISION]
-                           [--gitrepo-mount-path GITREPO_MOUNT_PATH]
-                           [--secrets SECRETS [SECRETS ...]]
-                           [--secrets-mount-path SECRETS_MOUNT_PATH]
-                           [--file FILE]
-                           [--assign-identity [ASSIGN_IDENTITY [ASSIGN_IDENTITY ...]]]
-                           [--scope IDENTITY_SCOPE] [--role IDENTITY_ROLE]
-                           [--no-wait] [--subscription _SUBSCRIPTION]
-#>
-
-
-az container show --resource-group $myResourceGroup --name $imageTag --query instanceView.state
-
-```
