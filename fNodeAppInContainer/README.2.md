@@ -52,12 +52,12 @@ First, we will create an Azure container registry and push our container image
 
 ```powershell
 az login # if you never logged in
-$myResourceGroup = "fnodeappincontainerResourceGroup"
+$myResourceGroup = "FredContainerRegistryResourceGroup"
 az group create --name $myResourceGroup --location eastus
 
 # Create an Azure container registry -- SKU BASIC $61 / year
 # 
-$acrName = "fnodeappincontainerContainerRegistry"
+$acrName = "FredContainerRegistry"
 az acr create --resource-group  $myResourceGroup --name $acrName --sku Basic --admin-enabled true
 
 # Log in to container registry
@@ -65,7 +65,7 @@ az acr login --name $acrName
 
 # Get the full login server name for your Azure container registry. 
 az acr show --name $acrName --query loginServer --output table
-$acrLoginServer = "fnodeappincontainercontainerregistry.azurecr.io"
+$acrLoginServer = "fredcontainerregistry.azurecr.io"
 $imageTag = "fredericaltorres/fnodeappincontainer"
 
 # Tag image with the loginServer of your container registry. 
@@ -88,22 +88,42 @@ az acr repository show-tags --name $acrName --repository $imageTag --output tabl
 
 ```powershell
 # Get the full login server name for your Azure container registry. 
-$myResourceGroup = "fnodeappincontainerResourceGroup"
-$acrName = "fnodeappincontainerContainerRegistry"
+$myResourceGroup = "FredContainerRegistryResourceGroup"
+$acrName = "FredContainerRegistry"
 $imageTag = "fredericaltorres/fnodeappincontainer"
-az acr show --name $acrName --query loginServer --output table
-$acrLoginServer = "fnodeappincontainercontainerregistry.azurecr.io"
+#az acr show --name $acrName --query loginServer --output table
+$acrLoginServer = "fredcontainerregistry.azurecr.io"
 $newTag = "$acrLoginServer/$imageTag`:v1"
 $azureLoginName = $acrName
-$azurePassword = $NULL
-$dnsLabel="fnodeappincontainerdns"
-$containeInstanceName = "$($imageTag)Instance2".replace("fredericaltorres/","").ToLower()
-"".tol
+$azurePassword = ""
+$containeInstanceName = "$($imageTag)Instance".replace("fredericaltorres/","").ToLower()
+$dnsLabel="$($containeInstanceName)dns"
 
-az container create --resource-group $myResourceGroup --name $containeInstanceName --image $newTag --cpu 1 --memory 1 --registry-login-server $acrLoginServer --registry-username $azureLoginName --registry-password $azurePassword  --dns-name-label $dnsLabel --ports 8080 --os-type Linux
+# az container xxxxx -> https://docs.microsoft.com/en-us/cli/azure/container?view=azure-cli-latest#az-container-delete
 
+$jsonString = az container create --resource-group $myResourceGroup --name $containeInstanceName --image $newTag --cpu 1 --memory 1 --registry-login-server $acrLoginServer --registry-username $azureLoginName --registry-password $azurePassword  --ports 8080 --os-type Linux --dns-name-label $dnsLabel
+
+$jsonContent = $jsonString | ConvertFrom-Json;
+$fqdn = $jsonContent.ipAddress.fqdn
+$ip = $jsonContent.ipAddress.ip
+$port = $jsonContent.ipAddress.ports.port
+$apiCallResult = Invoke-RestMethod -Method Get -Uri "http://$fqdn`:8080"
+"Api returned $apiCallResult"
+
+az container stop --resource-group $myResourceGroup --name $containeInstanceName
+az container start --resource-group $myResourceGroup --name $containeInstanceName
+az container delete --resource-group $myResourceGroup --name $containeInstanceName --yes
+$jsonString = az container list --resource-group $myResourceGroup
+$jsonString = az container show --resource-group $myResourceGroup --name $containeInstanceName
+az container logs --resource-group $myResourceGroup --name $containeInstanceName
+az container exec --resource-group $myResourceGroup --name $containeInstanceName --exec-command "/bin/bash"
+
+```
 
 <#
+
+  {list,create,show,delete,logs,exec,export,attach,restart,stop,start}
+
 usage: az container create [-h] [--verbose] [--debug]
                            [--output {json,jsonc,table,tsv,yaml,none}]
                            [--query JMESPATH] --resource-group

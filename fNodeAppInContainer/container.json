@@ -1,0 +1,109 @@
+{
+  "containers": [
+    {
+      "command": null,
+      "environmentVariables": [],
+      "image": "fredcontainerregistry.azurecr.io/fredericaltorres/fnodeappincontainer:v1",
+      "instanceView": {
+        "currentState": {
+          "detailStatus": "",
+          "exitCode": null,
+          "finishTime": null,
+          "startTime": "2019-05-04T22:42:09+00:00",
+          "state": "Running"
+        },
+        "events": [
+          {
+            "count": 1,
+            "firstTimestamp": "2019-05-04T22:41:10+00:00",
+            "lastTimestamp": "2019-05-04T22:41:10+00:00",
+            "message": "pulling image \"fredcontainerregistry.azurecr.io/fredericaltorres/fnodeappincontainer:v1\"",
+            "name": "Pulling",
+            "type": "Normal"
+          },
+          {
+            "count": 1,
+            "firstTimestamp": "2019-05-04T22:42:05+00:00",
+            "lastTimestamp": "2019-05-04T22:42:05+00:00",
+            "message": "Successfully pulled image \"fredcontainerregistry.azurecr.io/fredericaltorres/fnodeappincontainer:v1\"",
+            "name": "Pulled",
+            "type": "Normal"
+          },
+          {
+            "count": 1,
+            "firstTimestamp": "2019-05-04T22:42:09+00:00",
+            "lastTimestamp": "2019-05-04T22:42:09+00:00",
+            "message": "Created container",
+            "name": "Created",
+            "type": "Normal"
+          },
+          {
+            "count": 1,
+            "firstTimestamp": "2019-05-04T22:42:09+00:00",
+            "lastTimestamp": "2019-05-04T22:42:09+00:00",
+            "message": "Started container",
+            "name": "Started",
+            "type": "Normal"
+          }
+        ],
+        "previousState": null,
+        "restartCount": 0
+      },
+      "livenessProbe": null,
+      "name": "fnodeappincontainerinstance2",
+      "ports": [
+        {
+          "port": 8080,
+          "protocol": "TCP"
+        }
+      ],
+      "readinessProbe": null,
+      "resources": {
+        "limits": null,
+        "requests": {
+          "cpu": 1.0,
+          "gpu": null,
+          "memoryInGb": 1.0
+        }
+      },
+      "volumeMounts": null
+    }
+  ],
+  "diagnostics": null,
+  "dnsConfig": null,
+  "id": "/subscriptions/57646804-986c-47e8-af66-a3abec32e52a/resourceGroups/FredContainerRegistryResourceGroup/providers/Microsoft.ContainerInstance/containerGroups/fnodeappincontainerinstance2",
+  "identity": null,
+  "imageRegistryCredentials": [
+    {
+      "password": null,
+      "server": "fredcontainerregistry.azurecr.io",
+      "username": "FredContainerRegistry"
+    }
+  ],
+  "instanceView": {
+    "events": [],
+    "state": "Running"
+  },
+  "ipAddress": {
+    "dnsNameLabel": "FredContainerRegistrydns",
+    "fqdn": "FredContainerRegistrydns.eastus.azurecontainer.io",
+    "ip": "52.151.225.98",
+    "ports": [
+      {
+        "port": 8080,
+        "protocol": "TCP"
+      }
+    ],
+    "type": "Public"
+  },
+  "location": "eastus",
+  "name": "fnodeappincontainerinstance2",
+  "networkProfile": null,
+  "osType": "Linux",
+  "provisioningState": "Succeeded",
+  "resourceGroup": "FredContainerRegistryResourceGroup",
+  "restartPolicy": "Always",
+  "tags": {},
+  "type": "Microsoft.ContainerInstance/containerGroups",
+  "volumes": null
+}
