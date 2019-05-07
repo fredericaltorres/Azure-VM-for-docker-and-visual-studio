@@ -127,6 +127,10 @@ docker stop cde304650124 # How to stop a running container
 
 docker rmi fwebapidockerized:dev --force # how to delete an image
 docker rmi cde304650133 --force # how to delete an image
+
+# How to build a docker image from a current aspnetcore project
+docker build -f "C:\DVT\FWebApiDockerized\Dockerfile" -t fwebapidockerized:dev --target base --label "com.microsoft.created-by=visual-studio" "C:\DVT" 
+
 ```
 
 ### Publish to Azure Container Registry
