@@ -121,6 +121,12 @@ C:\>docker run --rm weshigbee/manifest-tool inspect microsoft/dotnet:2.0.0-previ
 
 ```powershell
 dotnet run # will compile and run the app from the command line
+
+docker stop fwebapidockerized:dev # How to stop a running container 
+docker stop cde304650124 # How to stop a running container
+
+docker rmi fwebapidockerized:dev --force # how to delete an image
+docker rmi cde304650133 --force # how to delete an image
 ```
 
 ### Publish to Azure Container Registry
