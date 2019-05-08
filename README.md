@@ -114,7 +114,15 @@ C:\>docker run --rm weshigbee/manifest-tool inspect microsoft/dotnet:2.0.0-previ
 [Download Visual Studio 2019 Pro or Community Edition](https://www.google.com)
 
 ### .NET Core Console App For Container
-[Containerize a .NET Core app](https://docs.microsoft.com/en-us/dotnet/core/docker/build-container)
+### Full Article: 
+- [Containerize a .NET Core app](https://docs.microsoft.com/en-us/dotnet/core/docker/build-container)
+#### Summary
+
+- Install Dotnet Core Runtime 2.2 and dotnet core SDK 2.2 from this [link](https://dotnet.microsoft.com/download)
+- Open prompt
+- ***TO BE CONTINUES***
+
+
 
 ### Create an ASP.NET Core Web App, Rest API with Docker support.
 - Create an ASP.NET Core Web App, Rest API with Docker support.
