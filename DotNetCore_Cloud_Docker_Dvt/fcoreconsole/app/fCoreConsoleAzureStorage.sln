@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28803.352
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "myapp", "myapp.csproj", "{8B88EAB4-3FC0-4AA9-95BA-D56AC5FF38C4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "fCoreConsoleAzureStorage", "fCoreConsoleAzureStorage.csproj", "{8B88EAB4-3FC0-4AA9-95BA-D56AC5FF38C4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fAzureHelper", "..\..\fAzureHelper\fAzureHelper.csproj", "{0BA23315-7C39-4E28-B07B-B6677A566301}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "fAzureHelper", "..\..\fAzureHelper\fAzureHelper.csproj", "{0BA23315-7C39-4E28-B07B-B6677A566301}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
