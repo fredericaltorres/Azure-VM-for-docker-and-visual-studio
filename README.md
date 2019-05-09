@@ -113,6 +113,18 @@ C:\>docker run --rm weshigbee/manifest-tool inspect microsoft/dotnet:2.0.0-previ
 [Download Git](https://git-scm.com/download/win)
 [Download Visual Studio 2019 Pro or Community Edition](https://www.google.com)
 
+### .NET Core Console App For Container
+- Create its own folder and own readme
+### Full Article: 
+- [Containerize a .NET Core app](https://docs.microsoft.com/en-us/dotnet/core/docker/build-container)
+#### Summary
+
+- Install Dotnet Core Runtime 2.2 and dotnet core SDK 2.2 from this [link](https://dotnet.microsoft.com/download)
+- Open prompt
+- ***TO BE CONTINUED***
+
+
+
 ### Create an ASP.NET Core Web App, Rest API with Docker support.
 - Create an ASP.NET Core Web App, Rest API with Docker support.
     * Run inside IIS Express: https://localhost:44389/api/values
@@ -121,6 +133,21 @@ C:\>docker run --rm weshigbee/manifest-tool inspect microsoft/dotnet:2.0.0-previ
 
 ```powershell
 dotnet run # will compile and run the app from the command line
+
+docker stop fwebapidockerized:dev # How to stop a running container 
+docker stop cde304650124 # How to stop a running container
+
+docker rmi fwebapidockerized:dev --force # how to delete an image
+docker rmi cde304650133 --force # how to delete an image
+
+# Variant 1 - how to build a container from the command line
+dotnet publish -c Release
+docker build -t fwebapidockerized --build-arg source=bin\Release\netcoreapp2.1\publish .
+
+# Variant 2 - how to build a container from the command line
+# How to build a docker image from a current aspnetcore project
+docker build -f "C:\DVT\FWebApiDockerized\Dockerfile" -t fwebapidockerized:dev --target base --label "com.microsoft.created-by=visual-studio" "C:\DVT" 
+
 ```
 
 ### Publish to Azure Container Registry
