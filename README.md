@@ -113,11 +113,10 @@ C:\>docker run --rm weshigbee/manifest-tool inspect microsoft/dotnet:2.0.0-previ
 - [Download Git](https://git-scm.com/download/win)
 - [Download Visual Studio 2019 Pro or Community Edition](https://www.google.com)
 
-### .NET Core Console App For Container
+### How to build and run this dot net core console as docker container locally and in Azure
 - [Containerize a .NET Core app](https://docs.microsoft.com/en-us/dotnet/core/docker/build-container)
 
-
-- [How to build and run this dot net core console as docker container locally and in Azure](./DotNetCore_Cloud_Docker_Dvt/fcoreconsole/app/PublishAsContainer.md)
+- [README](./DotNetCore_Cloud_Docker_Dvt/fcoreconsole/app/PublishAsContainer.md)
 
 
 
