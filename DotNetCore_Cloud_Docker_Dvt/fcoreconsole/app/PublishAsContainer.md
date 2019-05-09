@@ -16,7 +16,7 @@ Here are the following steps that I will be executing:
 
 ### Setup
 
-# Install Dotnet Core Runtime 2.2 and dotnet core SDK 2.2 from this [link](https://dotnet.microsoft.com/download)
+- Install Dotnet Core Runtime 2.2 and dotnet core SDK 2.2 from this [link](https://dotnet.microsoft.com/download)
 
 ### Reference
 
@@ -32,17 +32,21 @@ dotnet publish -c Release
 # build container image locally
 docker build -t fcoreconsoleazurestorage .
 
-
 # Create container instance
 docker create fcoreconsoleazurestorage
+
 # Find container instance id or code-name
 docker ps -a
+
 # start instance
 docker start 13b7cc1fba11   
+
 # view output of the console/ container log
 docker logs 13b7cc1fba11   # see output on the fly
+
 # stop container instance
 docker stop 13b7cc1fba11   
+
 # delete container instance
 docker delete 13b7cc1fba11   
 ```
