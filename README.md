@@ -108,20 +108,16 @@ C:\>docker run --rm weshigbee/manifest-tool inspect microsoft/dotnet:2.0.0-previ
 - The sub folder fNodeAppInContainer, contains a NodeJS REST API application, that be containerized, published to an Azure Container Registry, and instanciate multple time int the cloud using a PowerShell Script. 
 - [README](fNodeAppInContainer/README.md)
 
-## Visual Studio and Git
+## Download Visual Studio and Git
 
-[Download Git](https://git-scm.com/download/win)
-[Download Visual Studio 2019 Pro or Community Edition](https://www.google.com)
+- [Download Git](https://git-scm.com/download/win)
+- [Download Visual Studio 2019 Pro or Community Edition](https://www.google.com)
 
 ### .NET Core Console App For Container
-- Create its own folder and own readme
-### Full Article: 
 - [Containerize a .NET Core app](https://docs.microsoft.com/en-us/dotnet/core/docker/build-container)
-#### Summary
 
-- Install Dotnet Core Runtime 2.2 and dotnet core SDK 2.2 from this [link](https://dotnet.microsoft.com/download)
-- Open prompt
-- ***TO BE CONTINUED***
+
+- [How to build and run this dot net core console as docker container locally and in Azure](./DotNetCore_Cloud_Docker_Dvt/fcoreconsole/app/PublishAsContainer.md)
 
 
 

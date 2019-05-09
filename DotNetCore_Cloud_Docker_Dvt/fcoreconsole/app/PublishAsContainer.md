@@ -1,5 +1,27 @@
 ﻿# How to build and run this dot net core console as docker container locally and in Azure
 
+## Introduction
+This is a dot net core console that every 10 seconds
+- Create a text file locally
+- Upload the text file to an Azure storage
+
+The goal of the application is to be executed as a container in Azure.
+
+Here are the following steps that I will be executing:
+
+1. build and debug the application locally
+1. build the container image and run it as a local container (No debugging from visual studio was setup)
+1. publish the container image to an Azure Container Registry
+1. Instance an container instance and execute the console
+
+### Setup
+
+# Install Dotnet Core Runtime 2.2 and dotnet core SDK 2.2 from this [link](https://dotnet.microsoft.com/download)
+
+### Reference
+
+[Tutorial: Containerize a .NET Core app](https://docs.microsoft.com/en-us/dotnet/core/docker/build-container)
+
 ## How to build and run this dot net core console as docker container locally 
 
 ```bash
