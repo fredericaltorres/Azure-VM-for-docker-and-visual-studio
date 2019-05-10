@@ -33,7 +33,7 @@ namespace DotNetCoreConsole_Container_UpdatingAzureStorage
                 Console.WriteLine($"{i} execution(s).");
                 CreateTextFileInStorage().GetAwaiter().GetResult();
                 Console.WriteLine($"Waiting {WaitTime} seconds");
-                System.Threading.Tasks.Task.Delay(1000 * 5).Wait();
+                System.Threading.Tasks.Task.Delay(1000 * WaitTime).Wait();
             }
             Console.WriteLine("Done");
         }

@@ -52,7 +52,13 @@ docker delete 13b7cc1fba11
 ```
 
 ## How to publish the docker image into an Azure Container Registry
-- TODO
+The powershell script [deployContainerToAzureContainerRegistry.ps1](./deployContainerToAzureContainerRegistry.ps1) allow
+to 
+- build the .net project and create a docker container image locally tagged with the project version
+- push the last build container image to an My Azure Container Registry
 
 ## How to instantiate a container instance from a the docker image stored into Azure Container Registry
-- TODO
+The powershell script [deployContainerToAzureContainerRegistry.ps1](./deployContainerToAzureContainerRegistry.ps1) allow
+to 
+- Instanciate a container instance and run the console app
+- Stop and delete the container instance

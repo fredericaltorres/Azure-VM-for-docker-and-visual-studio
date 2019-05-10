@@ -1,7 +1,7 @@
 ﻿[CmdletBinding()]
 param(
     [Parameter(Mandatory=$false)]
-    [string]$action = "deleteInstantiate", # build, push, instantiate, deleteInstantiate
+    [string]$action = "deleteInstance", # build, push, instantiate, deleteInstance
     [Parameter(Mandatory=$false)]
     [string]$imageTag = "fcoreconsoleazurestorage",    
     [Parameter(Mandatory=$false)]
@@ -23,7 +23,10 @@ param(
     [Parameter(Mandatory=$false)] 
     [int]$containerInstanceMemory = 1,
     [Parameter(Mandatory=$false)] 
-    [int]$containerInstancePort = 8080
+    [int]$containerInstancePort = 8080,
+
+    [Parameter(Mandatory=$false)] 
+    [bool]$clearScreen = $true
 )
 
 function GetProjectName() {
@@ -52,11 +55,17 @@ function GetContainerInstanceIpFromJsonMetadata($jsonString) {
 }
 
 function Write-Host-Color([string]$message, $color = "Cyan") {
+    Write-Host ""
     Write-Host $message -ForegroundColor $color
 }
 
+if($clearScreen) {
+    cls
+}
+else {
+    Write-Host "" 
+}
 
-cls
 Write-Host "deployContainerToAzureContainerRegistry -Action:$action" -ForegroundColor Yellow
 Write-Host "Build project $(GetProjectName), version:$(GetProjectVersion)" -ForegroundColor DarkYellow
 
@@ -109,7 +118,7 @@ switch($action) {
         Write-Host-Color "Container Instance URL:$url"
     }
     # Stop and delete an instance of the container under a specific name and version
-    deleteInstantiate {
+    deleteInstance {
 
         Write-Host-Color "About to stop container instance:$containeInstanceName"
         az container stop --resource-group $myResourceGroup --name $containeInstanceName
