@@ -3,6 +3,8 @@ using Microsoft.WindowsAzure.Storage.Blob;
 using myapp;
 using System;
 using System.IO;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace DotNetCoreConsole_Container_UpdatingAzureStorage
@@ -16,9 +18,13 @@ namespace DotNetCoreConsole_Container_UpdatingAzureStorage
     public static class Program
     {
         public const int WaitTime = 5;
+        public static string GetVersion()
+        {
+            return Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
+        }
         public static void Main()
         {
-            Console.WriteLine("DotNet Core Console - Containerized - Update Azure Storeage");
+            Console.WriteLine($"DotNet Core Console - Containerized - Update Azure Storeage - v{GetVersion()}");
             Console.WriteLine();
             
             for(var i=0; i < 100; i++)
