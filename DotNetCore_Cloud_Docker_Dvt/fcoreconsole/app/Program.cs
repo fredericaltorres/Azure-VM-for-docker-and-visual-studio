@@ -21,8 +21,10 @@ namespace DotNetCoreConsole_Container_UpdatingAzureStorage
             Console.WriteLine("DotNet Core Console - Containerized - Update Azure Storeage");
             Console.WriteLine();
             
-            for(var i=0; i<100; i++)
+            for(var i=0; i < 100; i++)
             {
+                Console.WriteLine($"");
+                Console.WriteLine($"{i} execution(s).");
                 CreateTextFileInStorage().GetAwaiter().GetResult();
                 Console.WriteLine($"Waiting {WaitTime} seconds");
                 System.Threading.Tasks.Task.Delay(1000 * 5).Wait();
@@ -33,8 +35,8 @@ namespace DotNetCoreConsole_Container_UpdatingAzureStorage
         private static async Task CreateTextFileInStorage()
         {
             var bm = new BlobManagerAsync(
-                "storage4containers", 
-                "ZcMvvYtwUOtIFnnIU0DQw3HdbSlczN/",
+                "storage4containers",
+                "ZcMvvYtwUOtIFnnIU0DQw3HdbSlczN/sgDU9z8bu2dDkJBVyqNt9OlK4ooLDqo1rOsVFQmC/A6t9aYSeGSxrGg==",
                 "public");
 
             string localPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
