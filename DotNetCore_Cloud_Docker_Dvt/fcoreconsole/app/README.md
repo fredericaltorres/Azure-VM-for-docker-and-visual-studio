@@ -32,6 +32,9 @@ dotnet publish -c Release
 # build container image locally
 docker build -t fcoreconsoleazurestorage .
 
+# how to look into the image running as Linux OS
+docker run -it fcoreconsoleazurestorage /bin/bash
+
 # Create container instance
 docker create fcoreconsoleazurestorage
 
@@ -43,6 +46,12 @@ docker start 13b7cc1fba11
 
 # view output of the console/ container log
 docker logs 13b7cc1fba11   # see output on the fly
+
+# See container internal configuration
+docker inspect  e0dc418842ce
+
+# Connect to container using bash
+docker exec  9fb88d2109fe  "bin/bash"
 
 # stop container instance
 docker stop 13b7cc1fba11   

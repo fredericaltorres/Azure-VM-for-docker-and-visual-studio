@@ -26,13 +26,14 @@ namespace DotNetCoreConsole_Container_UpdatingAzureStorage
 
         public static void Main()
         {
-            IConfigurationRoot configuration = BuildConfiguration();
 
+            Console.WriteLine($"DotNet Core Console - Containerized - Update Azure Storeage - v{GetVersion()} - RunningInContainer:{RunningIsContainerMode()}");
+
+            IConfigurationRoot configuration = BuildConfiguration();
             var storageAccount = configuration["storage:accountName"];
             var storageKey = configuration["storage:key"];
             const string containerName = "public";
 
-            Console.WriteLine($"DotNet Core Console - Containerized - Update Azure Storeage - v{GetVersion()}");
             Console.WriteLine($"Storage:{storageAccount}, container:{containerName}");
 
             for (var i = 0; i < 100; i++)
@@ -46,12 +47,41 @@ namespace DotNetCoreConsole_Container_UpdatingAzureStorage
             Console.WriteLine("Done");
         }
 
+        private static bool RunningIsContainerMode()
+        {
+            return Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";
+        }
+
+        const string APP_SETTING_JSON_FILE_NAME = "appsettings.json";
+
         private static IConfigurationRoot BuildConfiguration()
         {
+
+            Console.WriteLine($"Reading configuration GetCurrentDirectory:{Directory.GetCurrentDirectory()}, file:{APP_SETTING_JSON_FILE_NAME}");
+            var fullName = Path.Combine(Directory.GetCurrentDirectory(), APP_SETTING_JSON_FILE_NAME);
+            Console.WriteLine($"fullName:{fullName}");
+            Console.WriteLine($"AppSetting file found {File.Exists(fullName)}");
+            Console.WriteLine("");
+
+            string localPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            Console.WriteLine($"localPath:{localPath}");
+            fullName = Path.Combine(localPath, APP_SETTING_JSON_FILE_NAME);
+            Console.WriteLine($"fullName:{fullName}");
+            Console.WriteLine($"AppSetting file found {File.Exists(fullName)}");
+
+            var loopIndex = 0;
+            while(true)
+            {
+                Console.WriteLine($"--{loopIndex++}");
+                System.Threading.Tasks.Task.Delay(1000*10).Wait();
+            }
+
             var builder = new ConfigurationBuilder()
                             .SetBasePath(Directory.GetCurrentDirectory())
-                            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+                            .AddJsonFile(APP_SETTING_JSON_FILE_NAME, optional: true, reloadOnChange: true);
             IConfigurationRoot configuration = builder.Build();
+
+            
             return configuration;
         }
 
