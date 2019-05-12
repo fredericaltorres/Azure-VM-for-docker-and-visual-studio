@@ -11,18 +11,22 @@ namespace fDotNetCoreContainerHelper
         {
             return Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";
         }
+
         public static string GetAppVersion()
         {
             return Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
         }
+
         public static string GetAppPath()
         {
             return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         }
+
         public static string GetAppSettingsJsonFile()
         {
             return GetAppFilePath("appsettings.json");
         }
+
         public static string GetAppFilePath(string file)
         {
             return Path.Combine(GetAppPath(), file);
@@ -37,6 +41,7 @@ namespace fDotNetCoreContainerHelper
         const string APP_SETTING_JSON_FILE_NAME = "appsettings.json";
 
         private static IConfigurationRoot _configurationRoot = null;
+
         public static IConfigurationRoot BuildAppSettingsJsonConfiguration()
         {
             if (_configurationRoot == null)
