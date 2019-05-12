@@ -1,4 +1,5 @@
-﻿using Microsoft.WindowsAzure.Storage;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using myapp;
 using System;
@@ -22,28 +23,44 @@ namespace DotNetCoreConsole_Container_UpdatingAzureStorage
         {
             return Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
         }
+
         public static void Main()
         {
+            IConfigurationRoot configuration = BuildConfiguration();
+
+            var storageAccount = configuration["storage:accountName"];
+            var storageKey = configuration["storage:key"];
+            const string containerName = "public";
+
             Console.WriteLine($"DotNet Core Console - Containerized - Update Azure Storeage - v{GetVersion()}");
-            Console.WriteLine();
-            
-            for(var i=0; i < 100; i++)
+            Console.WriteLine($"Storage:{storageAccount}, container:{containerName}");
+
+            for (var i = 0; i < 100; i++)
             {
                 Console.WriteLine($"");
                 Console.WriteLine($"{i} execution(s).");
-                CreateTextFileInStorage().GetAwaiter().GetResult();
+                CreateTextFileInStorage(storageAccount, storageKey, containerName).GetAwaiter().GetResult();
                 Console.WriteLine($"Waiting {WaitTime} seconds");
                 System.Threading.Tasks.Task.Delay(1000 * WaitTime).Wait();
             }
             Console.WriteLine("Done");
         }
 
-        private static async Task CreateTextFileInStorage()
+        private static IConfigurationRoot BuildConfiguration()
+        {
+            var builder = new ConfigurationBuilder()
+                            .SetBasePath(Directory.GetCurrentDirectory())
+                            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+            IConfigurationRoot configuration = builder.Build();
+            return configuration;
+        }
+
+        private static async Task CreateTextFileInStorage(string storageAccountName, string storageKey, string containerName)
         {
             var bm = new BlobManagerAsync(
-                "storage4containers",
-                "ZcMvvYtwUOtIFnnIU0DQw3HdbSlczN/sgDU9z8bu2dDkJBVyqNt9OlK4ooLDqo1rOsVFQmC/A6t9aYSeGSxrGg==",
-                "public");
+                storageAccountName,
+                storageKey,
+                containerName);
 
             string localPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             string localFileName = "QS_" + Guid.NewGuid().ToString() + ".txt";
