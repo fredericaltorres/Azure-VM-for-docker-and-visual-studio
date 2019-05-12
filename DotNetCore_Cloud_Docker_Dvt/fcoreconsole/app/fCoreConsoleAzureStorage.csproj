@@ -6,7 +6,7 @@
     <Description>A dot net core console to published as a Docker container in Azure Container Registry and executed in Azure Container Instance</Description>
     <Authors>Frederic Torres</Authors>
     <Copyright>Frederic Torres</Copyright>
-    <Version>1.0.13</Version>
+    <Version>1.0.14</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\fAzureHelper\fAzureHelper.csproj" />
+    <ProjectReference Include="..\fDotNetCoreContainerHelper\fDotNetCoreContainerHelper.csproj" />
   </ItemGroup>
 
   <ItemGroup>

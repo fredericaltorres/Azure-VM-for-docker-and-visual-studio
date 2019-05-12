@@ -32,8 +32,8 @@ dotnet publish -c Release
 # build container image locally
 docker build -t fcoreconsoleazurestorage .
 
-# how to look into the image running as Linux OS
-docker run -it fcoreconsoleazurestorage /bin/bash
+# Create and run a container instance from the last image attached to the current console
+docker run -it fcoreconsoleazurestorage
 
 # Create container instance
 docker create fcoreconsoleazurestorage
