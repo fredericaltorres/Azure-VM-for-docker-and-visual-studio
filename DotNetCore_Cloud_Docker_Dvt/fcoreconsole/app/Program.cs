@@ -25,9 +25,8 @@ namespace DotNetCoreConsole_Container_UpdatingAzureStorage
         {
             Console.WriteLine($"DotNet Core Console - Containerized - Update Azure Storeage - v{RuntimeHelper.GetAppVersion()} - IsRunningContainerMode:{RuntimeHelper.IsRunningContainerMode()}");
 
-            IConfigurationRoot configuration = BuildConfiguration();
-            var storageAccount = configuration["storage:accountName"];
-            var storageKey = configuration["storage:key"];
+            var storageAccount = RuntimeHelper.GetAppSettings("storage:accountName");
+            var storageKey = RuntimeHelper.GetAppSettings("storage:key");
             const string containerName = "public";
 
             Console.WriteLine($"Storage:{storageAccount}, container:{containerName}");
@@ -43,17 +42,7 @@ namespace DotNetCoreConsole_Container_UpdatingAzureStorage
             Console.WriteLine("Done");
         }
 
-        const string APP_SETTING_JSON_FILE_NAME = "appsettings.json";
-
-        private static IConfigurationRoot BuildConfiguration()
-        {
-            Console.WriteLine($"Reading configuration {RuntimeHelper.GetAppSettingsJsonFile()}");
-            var builder = new ConfigurationBuilder()
-                            .SetBasePath(RuntimeHelper.GetAppPath())
-                            .AddJsonFile(APP_SETTING_JSON_FILE_NAME, optional: true, reloadOnChange: true);
-            IConfigurationRoot configuration = builder.Build();
-            return configuration;
-        }
+   
 
         private static async Task CreateTextFileInStorage(string storageAccountName, string storageKey, string containerName)
         {

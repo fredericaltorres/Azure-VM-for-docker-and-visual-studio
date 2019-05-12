@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using System;
 using System.IO;
 using System.Reflection;
 
@@ -31,6 +32,27 @@ namespace fDotNetCoreContainerHelper
         {
             // /root in Linux
             return Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments); 
+        }
+
+        const string APP_SETTING_JSON_FILE_NAME = "appsettings.json";
+
+        private static IConfigurationRoot _configurationRoot = null;
+        public static IConfigurationRoot BuildAppSettingsJsonConfiguration()
+        {
+            if (_configurationRoot == null)
+            {
+                Console.WriteLine($"Reading configuration {RuntimeHelper.GetAppSettingsJsonFile()}");
+                var builder = new ConfigurationBuilder()
+                                .SetBasePath(RuntimeHelper.GetAppPath())
+                                .AddJsonFile(APP_SETTING_JSON_FILE_NAME, optional: true, reloadOnChange: true);
+                _configurationRoot = builder.Build();
+            }
+            return _configurationRoot;
+        }
+
+        public static string GetAppSettings(string name)
+        {
+            return BuildAppSettingsJsonConfiguration()[name];
         }
 
         public static void InfiniteLoop(int max = 10000)

@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "fCoreConsoleAzureStorage", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "fAzureHelper", "..\..\fAzureHelper\fAzureHelper.csproj", "{0BA23315-7C39-4E28-B07B-B6677A566301}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fDotNetCoreContainerHelper", "..\fDotNetCoreContainerHelper\fDotNetCoreContainerHelper.csproj", "{E7D82180-81B9-440B-AE86-450446B4535E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "fDotNetCoreContainerHelper", "..\..\fDotNetCoreContainerHelper\fDotNetCoreContainerHelper.csproj", "{6E9E25C6-AA4B-48FA-8425-627DE3E2D974}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{0BA23315-7C39-4E28-B07B-B6677A566301}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0BA23315-7C39-4E28-B07B-B6677A566301}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0BA23315-7C39-4E28-B07B-B6677A566301}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E7D82180-81B9-440B-AE86-450446B4535E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E7D82180-81B9-440B-AE86-450446B4535E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E7D82180-81B9-440B-AE86-450446B4535E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E7D82180-81B9-440B-AE86-450446B4535E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E9E25C6-AA4B-48FA-8425-627DE3E2D974}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E9E25C6-AA4B-48FA-8425-627DE3E2D974}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E9E25C6-AA4B-48FA-8425-627DE3E2D974}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E9E25C6-AA4B-48FA-8425-627DE3E2D974}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
