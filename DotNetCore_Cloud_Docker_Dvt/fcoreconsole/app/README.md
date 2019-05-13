@@ -1,8 +1,8 @@
 ﻿# How to build and run this dot net core console as docker container locally and in Azure
 
 ## Introduction
-This is a dot net core console which in tis default execution mode in a container execute the following
-that every 10 seconds
+This is a dot net core console which in its default execution mode in a 
+**Docker Container** execute the following every 10 seconds
 - Create a text file locally
 - Upload the text file to an Azure storage
 - Enqueue the file name into an azure queue
@@ -17,17 +17,23 @@ fCoreConsoleAzureStorage sendMessage
 fCoreConsoleAzureStorage help
 ```
 
-`The main idea is to be able to send command to the console instance running in the container.`
+The main idea is to be able to send command to the console instance running in the container.
 
 
-The goal of the application is to be executed as a container in Azure.
+## Build and deployment
 
-Here are the following steps that I will be executing:
+Here are the following steps 
 
-1. build and debug the application locally
-1. build the container image and run it as a local container (No debugging from visual studio was setup)
-1. publish the container image to an Azure Container Registry
+1. Build and debug the application locally
+1. Build the container image and run it as a local container (No debugging from visual studio was setup)
+1. Publish the container image to an Azure Container Registry
 1. Instance an container instance and execute the console
+1. Delete the instance of the container 
+
+The powershell script deployContainerToAzureContainerRegistry.ps1 can execute one of this step.
+The powershell script executeInCloud.ps1 can execute step
+- 1, 2, 3, 4 or
+- 5
 
 ### Setup
 
