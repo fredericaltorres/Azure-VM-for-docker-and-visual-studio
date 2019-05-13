@@ -1,38 +1,24 @@
-﻿using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
+﻿using Microsoft.WindowsAzure.Storage.Blob;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace myapp
+namespace fAzureHelper
 {
-    public class BlobManagerAsync
+
+    public class BlobManager : AzureStorageBaseClass
     {
-        private const string ConnectionStringFormat = "DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1}";
-
-        public string _storageAccountName;
-        private string _storageAccessKey;
         public string _containerName;
-
-        CloudStorageAccount _storageAccount = null;
+        
         CloudBlobContainer _cloudBlobContainer = null;
         CloudBlobClient _cloudBlobClient = null;
 
-        private string GetConnectString()
-        {
-            return string.Format(ConnectionStringFormat, this._storageAccountName, this._storageAccessKey);
-        }
 
-        public BlobManagerAsync(string storageAccountName, string storageAccessKey, string containerName)
+        public BlobManager(string storageAccountName, string storageAccessKey, string containerName) : base(storageAccountName, storageAccessKey)
         {
-            this._storageAccountName = storageAccountName.ToLowerInvariant();
-            this._storageAccessKey = storageAccessKey;
             this._containerName = containerName.ToLowerInvariant();
-
-            if (!CloudStorageAccount.TryParse(GetConnectString(), out _storageAccount))
-                throw new ApplicationException("Cannot parse connection string");
 
             this._cloudBlobClient = _storageAccount.CreateCloudBlobClient();
             this._cloudBlobContainer = _cloudBlobClient.GetContainerReference(containerName);
@@ -48,19 +34,6 @@ namespace myapp
                 var containerPermissions = new BlobContainerPermissions();
                 containerPermissions.PublicAccess = BlobContainerPublicAccessType.Blob; // Public
                 await container.SetPermissionsAsync(containerPermissions);
-
-                //// Create a container called 'quickstartblobs' and append a GUID value to it to make the name unique. 
-                //cloudBlobContainer = cloudBlobClient.GetContainerReference("quickstartblobs" + Guid.NewGuid().ToString());
-                //await cloudBlobContainer.CreateAsync();
-                //Console.WriteLine("Created container '{0}'", cloudBlobContainer.Name);
-                //Console.WriteLine();
-
-                //// Set the permissions so the blobs are public. 
-                //BlobContainerPermissions permissions = new BlobContainerPermissions
-                //{
-                //    PublicAccess = BlobContainerPublicAccessType.Blob
-                //};
-                //await cloudBlobContainer.SetPermissionsAsync(permissions);
             }
             return container;
         }

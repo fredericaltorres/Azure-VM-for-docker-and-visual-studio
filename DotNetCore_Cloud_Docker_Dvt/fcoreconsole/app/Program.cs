@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
-using myapp;
+using fAzureHelper;
 using System;
 using System.IO;
 using System.Reflection;
@@ -21,13 +21,34 @@ namespace DotNetCoreConsole_Container_UpdatingAzureStorage
     {
         public const int WaitTime = 5;
 
-        public static void Main()
+        public static async Task Main(string [] args)
         {
             Console.WriteLine($"DotNet Core Console - Containerized - Update Azure Storeage - v{RuntimeHelper.GetAppVersion()} - IsRunningContainerMode:{RuntimeHelper.IsRunningContainerMode()}");
 
             var storageAccount = RuntimeHelper.GetAppSettings("storage:accountName");
             var storageKey = RuntimeHelper.GetAppSettings("storage:key");
             const string containerName = "public";
+            const string queueName = "myQueue2";
+
+            var qm = new QueueManager(storageAccount, storageKey, queueName);
+            var bm = new BlobManager(storageAccount, storageKey, containerName);
+
+            if(args.Length > 0)
+            {
+                switch(args[0].ToLowerInvariant())
+                {
+                    case "clearqueue":
+                        var deleteMessages = await qm.ClearAsync();
+                        Console.WriteLine($"{deleteMessages.Count} deleted message");
+                        break;
+                    case "sendmessage":
+                        Console.WriteLine($"Sending Message:{args[1]}");
+                        var messageId = await qm.EnqueueAsync(args[1]);
+                        Console.WriteLine($"MessageId:${messageId}");
+                        break;
+                }
+                Environment.Exit(0);
+            }
 
             Console.WriteLine($"Storage:{storageAccount}, container:{containerName}");
 
@@ -35,31 +56,32 @@ namespace DotNetCoreConsole_Container_UpdatingAzureStorage
             {
                 Console.WriteLine($"");
                 Console.WriteLine($"{i} execution(s).");
-                CreateTextFileInStorage(storageAccount, storageKey, containerName).GetAwaiter().GetResult();
+                CreateTextFileInStorage(bm, qm).GetAwaiter().GetResult();
                 Console.WriteLine($"Waiting {WaitTime} seconds");
                 System.Threading.Tasks.Task.Delay(1000 * WaitTime).Wait();
             }
             Console.WriteLine("Done");
         }
 
-   
 
-        private static async Task CreateTextFileInStorage(string storageAccountName, string storageKey, string containerName)
+        private static async Task CreateTextFileInStorage(BlobManager blobManager, QueueManager queueManager)
         {
-            var bm = new BlobManagerAsync(
-                storageAccountName,
-                storageKey,
-                containerName);
-
+            Console.WriteLine($"{await queueManager.ApproximateMessageCountAsync()} message in the queue");
+            
             string localPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             string localFileName = "QS_" + Guid.NewGuid().ToString() + ".txt";
             var fullPathFileName = Path.Combine(localPath, localFileName);
+
+            await queueManager.EnqueueAsync($"CreatingFile {localFileName}");
 
             Console.WriteLine($"About to create localfile:{fullPathFileName}");
             File.WriteAllText(fullPathFileName, "Hello, World!");
 
             Console.WriteLine($"About to upload localfile:{fullPathFileName}");
-            await bm.UploadFileAsync(fullPathFileName);
+            await blobManager.UploadFileAsync(fullPathFileName);
+
+            Console.WriteLine($"");
+
             //await bm.DownloadFileAsync(fullPathFileName, fullPathFileName+".txt");
             //await bm.DeleteFileAsync(fullPathFileName);
         }
