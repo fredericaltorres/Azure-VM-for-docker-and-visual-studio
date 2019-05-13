@@ -46,7 +46,7 @@ namespace fDotNetCoreContainerHelper
         {
             if (_configurationRoot == null)
             {
-                Console.WriteLine($"Reading configuration {RuntimeHelper.GetAppSettingsJsonFile()}");
+                // Console.WriteLine($"Reading configuration {RuntimeHelper.GetAppSettingsJsonFile()}");
                 var builder = new ConfigurationBuilder()
                                 .SetBasePath(RuntimeHelper.GetAppPath())
                                 .AddJsonFile(APP_SETTING_JSON_FILE_NAME, optional: true, reloadOnChange: true);

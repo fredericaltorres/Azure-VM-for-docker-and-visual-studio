@@ -37,9 +37,21 @@ namespace DotNetCoreConsole_Container_UpdatingAzureStorage
             {
                 switch(args[0].ToLowerInvariant())
                 {
+                    case "help":
+                        Console.WriteLine(@"fCoreConsoleAzureStorage
+clearQueue | clearStorage | SendMessage ""text""
+
+with no parameter, default mode uploading a blob file to storage and logging a message to queue
+");
+                        break;
                     case "clearqueue":
                         var deleteMessages = await qm.ClearAsync();
                         Console.WriteLine($"{deleteMessages.Count} deleted message");
+                        break;
+                    case "clearstorage":
+                        var blobs = await bm.DirAsync();
+                        Console.WriteLine($"About to delete {blobs.Count} cloud file from storage container:{bm.ContainerName}");
+                        await bm.DeleteFileAsync(blobs);
                         break;
                     case "sendmessage":
                         Console.WriteLine($"Sending Message:{args[1]}");

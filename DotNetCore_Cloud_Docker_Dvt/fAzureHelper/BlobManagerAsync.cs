@@ -7,18 +7,16 @@ using System.Threading.Tasks;
 
 namespace fAzureHelper
 {
-
     public class BlobManager : AzureStorageBaseClass
     {
-        public string _containerName;
-        
-        CloudBlobContainer _cloudBlobContainer = null;
-        CloudBlobClient _cloudBlobClient = null;
+        public string ContainerName;
 
+        private CloudBlobContainer _cloudBlobContainer = null;
+        private CloudBlobClient _cloudBlobClient = null;
 
         public BlobManager(string storageAccountName, string storageAccessKey, string containerName) : base(storageAccountName, storageAccessKey)
         {
-            this._containerName = containerName.ToLowerInvariant();
+            this.ContainerName = containerName.ToLowerInvariant();
 
             this._cloudBlobClient = _storageAccount.CreateCloudBlobClient();
             this._cloudBlobContainer = _cloudBlobClient.GetContainerReference(containerName);
@@ -59,20 +57,53 @@ namespace fAzureHelper
             CloudBlockBlob cloudBlockBlob = _cloudBlobContainer.GetBlockBlobReference(cloudFileName);
             await cloudBlockBlob.UploadFromFileAsync(localFileName);
         }
+
         public async Task DeleteContainerAsync()
         {
             await _cloudBlobContainer.DeleteIfExistsAsync();
         }
+
+        public async Task DeleteFileAsync(List<string> cloudFileNames)
+        {
+            foreach (var f in cloudFileNames)
+                await DeleteFileAsync(f);
+        }
+
         public async Task DeleteFileAsync(string cloudFileName)
         {
             cloudFileName = Path.GetFileName(cloudFileName);
             CloudBlockBlob sourceBlob = _cloudBlobContainer.GetBlockBlobReference(cloudFileName);
             await sourceBlob.DeleteAsync();
         }
+
         public async Task<bool> FileExistAsync(string cloudFileName)
         {
             CloudBlockBlob blockBlob = _cloudBlobContainer.GetBlockBlobReference(cloudFileName);
             return await blockBlob.ExistsAsync();
+        }
+
+        public async Task<List<string>> DirAsync()
+        {
+            var l = new List<string>();
+
+            BlobContinuationToken continuationToken = null;
+            var prefix = null as String;
+            var useFlatBlobListing = true;
+            var blobListingDetails = BlobListingDetails.All;
+            var maxBlobsPerRequest = 32;
+            do
+            {
+                var listingResult = await _cloudBlobContainer.ListBlobsSegmentedAsync(prefix, useFlatBlobListing, blobListingDetails, maxBlobsPerRequest, continuationToken, null, null);
+                continuationToken = listingResult.ContinuationToken;
+                foreach (var r in listingResult.Results)
+                {
+                    var b = r as CloudBlockBlob;
+                    l.Add(b.Name);
+                }
+            }
+            while (continuationToken != null);
+
+            return l;
         }
     }
 }
