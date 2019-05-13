@@ -1,9 +1,24 @@
 ﻿# How to build and run this dot net core console as docker container locally and in Azure
 
 ## Introduction
-This is a dot net core console that every 10 seconds
+This is a dot net core console which in tis default execution mode in a container execute the following
+that every 10 seconds
 - Create a text file locally
 - Upload the text file to an Azure storage
+- Enqueue the file name into an azure queue
+
+Running the same console from a Windows or Linux machine, we can execute the following command
+
+```bash
+fCoreConsoleAzureStorage dirStorage
+fCoreConsoleAzureStorage clearStorage
+fCoreConsoleAzureStorage clearQueue
+fCoreConsoleAzureStorage sendMessage
+fCoreConsoleAzureStorage help
+```
+
+`The main idea is to be able to send command to the console instance running in the container.`
+
 
 The goal of the application is to be executed as a container in Azure.
 
