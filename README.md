@@ -115,7 +115,7 @@ C:\>docker run --rm weshigbee/manifest-tool inspect microsoft/dotnet:2.0.0-previ
 
 ## How to build and run a dot net core console as docker container locally and in Azure
 
-- [README](./DotNetCore_Cloud_Docker_Dvt/fcoreconsole/app/PublishAsContainer.md)
+- [README](./DotNetCore_Cloud_Docker_Dvt/fcoreconsole/app)
 
 ## Create an ASP.NET Core Web App, Rest API with Docker support (Not finished).
 - Create an ASP.NET Core Web App, Rest API with Docker support.
