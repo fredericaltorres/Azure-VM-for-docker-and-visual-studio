@@ -103,7 +103,7 @@ C:\>docker run --rm weshigbee/manifest-tool inspect microsoft/dotnet:2-runtime
 C:\>docker run --rm weshigbee/manifest-tool inspect microsoft/dotnet:2.0.0-preview1-runtime-jessie
 ```
 
-## How to build, test, publish and instanciate a container image based on a NodeJS app in Azure
+## How to build and a NodeJS REST API as docker container locally and in Azure
 - [Download node js](https://nodejs.org/en/download/)
 - The sub folder fNodeAppInContainer, contains a NodeJS REST API application, that be containerized, published to an Azure Container Registry, and instanciate multple time int the cloud using a PowerShell Script. 
 - [README](fNodeAppInContainer/README.md)
@@ -113,7 +113,7 @@ C:\>docker run --rm weshigbee/manifest-tool inspect microsoft/dotnet:2.0.0-previ
 - [Download Git](https://git-scm.com/download/win)
 - [Download Visual Studio 2019 Pro or Community Edition](https://www.google.com)
 
-## How to build and run this dot net core console as docker container locally and in Azure
+## How to build and run a dot net core console as docker container locally and in Azure
 
 - [README](./DotNetCore_Cloud_Docker_Dvt/fcoreconsole/app/PublishAsContainer.md)
 
