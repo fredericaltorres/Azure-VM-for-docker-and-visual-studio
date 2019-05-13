@@ -27,60 +27,60 @@ namespace fAzureHelper
 
         //Error CS0029  Cannot implicitly convert type 'Microsoft.WindowsAzure.Storage.Queue.CloudQueueClient' 
         // to 'Microsoft.Azure.Storage.Queue.CloudQueueClient'  fAzureHelper 
-        Microsoft.WindowsAzure.Storage.Queue.CloudQueueClient queueClient = null;
+        Microsoft.WindowsAzure.Storage.Queue.CloudQueueClient _queueClient = null;
 
         public QueueManager(string storageAccountName, string storageAccessKey, string queueName) : base(storageAccountName, storageAccessKey)
         {
             this._queueName = queueName.ToLowerInvariant();
-            queueClient = _storageAccount.CreateCloudQueueClient();
-
-            _queue = queueClient.GetQueueReference("myqueue");
-            _queue.CreateIfNotExistsAsync().GetAwaiter().GetResult();
+            this._queueClient = _storageAccount.CreateCloudQueueClient();
+            this._queue = this._queueClient.GetQueueReference(this._queueName);
+            this._queue.CreateIfNotExistsAsync().GetAwaiter().GetResult();
         }
 
         public async Task<string> EnqueueAsync(string content)
         {
             CloudQueueMessage message = new CloudQueueMessage(content);
-            await _queue.AddMessageAsync(message);
+            await this._queue.AddMessageAsync(message);
+
             return message.Id;
         }
 
-        public async Task<QueueMessage> PeekAsync()
+        private QueueMessage BuildQueueMessage(CloudQueueMessage m)
         {
-            CloudQueueMessage m = await _queue.PeekMessageAsync();
-
-            if (m == null)
-                return null;
-
             return new QueueMessage
             {
                 Id = m.Id,
                 AsString = m.AsString,
                 PopReceipt = m.PopReceipt
             };
+        }
+
+        public async Task<QueueMessage> PeekAsync()
+        {
+            CloudQueueMessage m = await this._queue.PeekMessageAsync();
+
+            if (m == null)
+                return null;
+
+            return BuildQueueMessage(m);
         }
 
         public async Task<int> ApproximateMessageCountAsync()
         {
             await this._queue.FetchAttributesAsync();
-            var c = this._queue.ApproximateMessageCount.HasValue ? _queue.ApproximateMessageCount.Value : -1;
-            return c;
+
+            return this._queue.ApproximateMessageCount.HasValue ? this._queue.ApproximateMessageCount.Value : -1;
         }
 
         public async Task<QueueMessage> DequeueAsync()
         {
-            CloudQueueMessage m = await _queue.GetMessageAsync();
+            CloudQueueMessage m = await this._queue.GetMessageAsync();
             if (m == null)
                 return null;
 
-            _inProcessMessages.Add(m);
+            this._inProcessMessages.Add(m);
 
-            return new QueueMessage
-            {
-                Id = m.Id,
-                AsString = m.AsString,
-                PopReceipt = m.PopReceipt
-            };
+            return BuildQueueMessage(m);
         }
 
         public async Task DeleteAsync(string id)
@@ -88,7 +88,8 @@ namespace fAzureHelper
             var cloudMessage = this._inProcessMessages.FirstOrDefault(m => m.Id == id);
             if (cloudMessage == null)
                 throw new ApplicationException($"Cannot find queue message id:{id} in the _inProcessMessages list");
-            await _queue.DeleteMessageAsync(cloudMessage);
+
+            await this._queue.DeleteMessageAsync(cloudMessage);
         }
 
         public async Task<List<QueueMessage>> ClearAsync()
@@ -100,6 +101,7 @@ namespace fAzureHelper
                 l.Add(m);
                 await this.DeleteAsync(m.Id);
             }
+
             return l;
         }
     }

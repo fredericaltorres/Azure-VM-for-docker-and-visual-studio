@@ -39,7 +39,7 @@ namespace DotNetCoreConsole_Container_UpdatingAzureStorage
                 {
                     case "help":
                         Console.WriteLine(@"fCoreConsoleAzureStorage
-clearQueue | clearStorage | SendMessage ""text""
+clearQueue | clearStorage | dirStorage | SendMessage ""text""
 
 with no parameter, default mode uploading a blob file to storage and logging a message to queue
 ");
@@ -49,14 +49,28 @@ with no parameter, default mode uploading a blob file to storage and logging a m
                         Console.WriteLine($"{deleteMessages.Count} deleted message");
                         break;
                     case "clearstorage":
-                        var blobs = await bm.DirAsync();
-                        Console.WriteLine($"About to delete {blobs.Count} cloud file from storage container:{bm.ContainerName}");
-                        await bm.DeleteFileAsync(blobs);
+                        {
+                            var blobs = await bm.DirAsync();
+                            Console.WriteLine($"About to delete {blobs.Count} cloud file from storage container:{bm.ContainerName}");
+                            await bm.DeleteFileAsync(blobs);
+                        }
                         break;
+                    case "dirstorage":
+                        {
+                            var blobs = await bm.DirAsync();
+                            Console.WriteLine($"Dir {blobs.Count} cloud file from storage container:{bm.ContainerName}");
+                            foreach (var b in blobs)
+                                Console.WriteLine(b);
+                        }
+                        break;
+
                     case "sendmessage":
                         Console.WriteLine($"Sending Message:{args[1]}");
                         var messageId = await qm.EnqueueAsync(args[1]);
                         Console.WriteLine($"MessageId:${messageId}");
+                        break;
+                    default:
+                        Console.WriteLine($"Command not supported:{args[0]}");
                         break;
                 }
                 Environment.Exit(0);
