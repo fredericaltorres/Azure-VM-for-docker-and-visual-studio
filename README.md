@@ -106,7 +106,7 @@ C:\>docker run --rm weshigbee/manifest-tool inspect microsoft/dotnet:2.0.0-previ
 ## How to build and a NodeJS REST API as docker container locally and in Azure
 - [Download node js](https://nodejs.org/en/download/)
 - The sub folder fNodeAppInContainer, contains a NodeJS REST API application, that be containerized, published to an Azure Container Registry, and instanciate multple time int the cloud using a PowerShell Script. 
-- [README](fNodeAppInContainer/README.md)
+- [README](fNodeAppInContainer)
 
 ## Download Visual Studio and Git
 
