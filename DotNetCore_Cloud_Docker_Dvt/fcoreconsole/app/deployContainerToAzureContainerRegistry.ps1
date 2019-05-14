@@ -117,6 +117,7 @@ switch($action) {
         $url = GetContainerInstanceIpFromJsonMetadata $jsonString
         Write-Host-Color "Container Instance URL:$url"
     }
+
     # Stop and delete an instance of the container under a specific name and version
     deleteInstance {
 

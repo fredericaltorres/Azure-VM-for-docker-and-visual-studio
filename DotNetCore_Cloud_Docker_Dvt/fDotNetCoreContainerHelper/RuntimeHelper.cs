@@ -32,6 +32,11 @@ namespace fDotNetCoreContainerHelper
             return Path.Combine(GetAppPath(), file);
         }
 
+        public static string GetAppFolderPath(string folder)
+        {
+            return Path.Combine(GetAppPath(), folder);
+        }
+
         public static string GetMyDocumentsPath()
         {
             // /root in Linux
