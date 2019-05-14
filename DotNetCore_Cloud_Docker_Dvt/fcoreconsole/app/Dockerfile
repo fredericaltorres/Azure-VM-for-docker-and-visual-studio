@@ -16,10 +16,16 @@ MAINTAINER Frederic Torres
 # Set environment variable
 ENV Fred true
 
+# Run a bash command as part of the image building...
+# It is a Linux bash command
 RUN echo Add local file to image
 
 # Add local file to image in the default directory where all the .exe and .dll will be layout
 ADD ./data.txt app/
+
+# Create sub directory in app folder and copy data.txt
+RUN mkdir app/tutu
+ADD ./data.txt app/tutu
 
 COPY bin/Release/netcoreapp2.2/publish/ app/
 

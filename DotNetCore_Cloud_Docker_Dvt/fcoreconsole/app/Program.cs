@@ -29,6 +29,9 @@ namespace DotNetCoreConsole_Container_UpdatingAzureStorage
             var dataTxtFile = RuntimeHelper.GetAppFilePath("data.txt");
             Console.WriteLine($"dataTxtFile:${dataTxtFile}, exists:{File.Exists(dataTxtFile)}");
 
+            var tutuFolder = RuntimeHelper.GetAppFilePath("tutu");
+            Console.WriteLine($"tutuFolder:${tutuFolder}, exists:{Directory.Exists(tutuFolder)}");
+
             var storageAccount = RuntimeHelper.GetAppSettings("storage:accountName");
             var storageKey = RuntimeHelper.GetAppSettings("storage:key");
             const string containerName = "public";
