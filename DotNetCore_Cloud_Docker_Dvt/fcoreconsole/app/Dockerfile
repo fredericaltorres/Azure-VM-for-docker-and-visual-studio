@@ -16,6 +16,11 @@ MAINTAINER Frederic Torres
 # Set environment variable
 ENV Fred true
 
+RUN echo Add local file to image
+
+# Add local file to image in the default directory where all the .exe and .dll will be layout
+ADD ./data.txt app/
+
 COPY bin/Release/netcoreapp2.2/publish/ app/
 
 ENTRYPOINT ["dotnet", "app/fCoreConsoleAzureStorage.dll"]
