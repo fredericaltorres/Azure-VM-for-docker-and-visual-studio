@@ -31,7 +31,7 @@ Here are the following steps
 1. Delete the instance of the container 
 
 The powershell script `deployContainerToAzureContainerRegistry.ps1` can execute one of these steps.
-The powershell script `executeInCloud.ps1` can execute step
+The powershell script `executeInCloud.ps1` can execute steps
 - 1, 2, 3, 4 or
 - 5
 

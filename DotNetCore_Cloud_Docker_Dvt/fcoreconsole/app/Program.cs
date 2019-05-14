@@ -24,6 +24,7 @@ namespace DotNetCoreConsole_Container_UpdatingAzureStorage
         public static async Task Main(string [] args)
         {
             Console.WriteLine($"DotNet Core Console - Containerized - Update Azure Storeage - v{RuntimeHelper.GetAppVersion()} - IsRunningContainerMode:{RuntimeHelper.IsRunningContainerMode()}");
+            Console.WriteLine($"Env Fred={Environment.GetEnvironmentVariable("Fred")}");
 
             var storageAccount = RuntimeHelper.GetAppSettings("storage:accountName");
             var storageKey = RuntimeHelper.GetAppSettings("storage:key");
