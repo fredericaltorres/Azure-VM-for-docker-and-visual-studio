@@ -1,12 +1,41 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System;
+using System.Text;
+using System.Linq;
 using System.IO;
 using System.Reflection;
+using System.Collections.Generic;
 
 namespace fDotNetCoreContainerHelper
 {
     public class RuntimeHelper
     {
+        private static string ListToString(List<string> list)
+        {
+            var s = new StringBuilder();
+            foreach (var l in list)
+                s.Append(l).Append(" ");
+            return s.ToString().TrimEnd();
+        }
+
+        public static string GetContextInformation()
+        {
+            var s = new StringBuilder();
+            s.Append($"CommandLine:{Environment.CommandLine}").AppendLine();
+            s.Append($"CurrentDirectory:{Environment.CurrentDirectory}").AppendLine();
+            s.Append($"GetCommandLineArgs:{ListToString(Environment.GetCommandLineArgs().ToList())}").AppendLine();
+            s.Append($"Is64BitOperatingSystem:{Environment.Is64BitOperatingSystem}").AppendLine();
+            s.Append($"Is64BitProcess:{Environment.Is64BitProcess}").AppendLine();
+            s.Append($"MachineName:{Environment.MachineName}").AppendLine();
+            s.Append($"UserDomainName:{Environment.UserDomainName}").AppendLine();
+            s.Append($"UserName:{Environment.UserName}").AppendLine();
+            s.Append($"Common Language Runtime Version:{Environment.Version}").AppendLine();
+            s.Append($"OSVersion:{Environment.OSVersion}").AppendLine();
+            s.Append($"SystemDirectory:{Environment.SystemDirectory}").AppendLine();
+            
+            return s.ToString();
+        }
+
         public static bool IsRunningContainerMode()
         {
             return Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";

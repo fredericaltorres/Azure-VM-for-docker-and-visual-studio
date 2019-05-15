@@ -25,6 +25,7 @@ namespace DotNetCoreConsole_Container_UpdatingAzureStorage
         {
             Console.WriteLine($"DotNet Core Console - Containerized - Update Azure Storeage - v{RuntimeHelper.GetAppVersion()} - IsRunningContainerMode:{RuntimeHelper.IsRunningContainerMode()}");
             Console.WriteLine($"Env Fred={Environment.GetEnvironmentVariable("Fred")}");
+            Console.WriteLine(RuntimeHelper.GetContextInformation());
 
             var dataTxtFile = RuntimeHelper.GetAppFilePath("data.txt");
             Console.WriteLine($"dataTxtFile:${dataTxtFile}, exists:{File.Exists(dataTxtFile)}");
