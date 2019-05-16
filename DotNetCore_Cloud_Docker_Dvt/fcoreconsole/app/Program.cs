@@ -8,6 +8,9 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using DynamicSugar;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace DotNetCoreConsole_Container_UpdatingAzureStorage
 {
@@ -26,6 +29,15 @@ namespace DotNetCoreConsole_Container_UpdatingAzureStorage
             Console.WriteLine($"DotNet Core Console - Containerized - Update Azure Storeage - v{RuntimeHelper.GetAppVersion()} - IsRunningContainerMode:{RuntimeHelper.IsRunningContainerMode()}");
             Console.WriteLine($"Env Fred={Environment.GetEnvironmentVariable("Fred")}");
             Console.WriteLine(RuntimeHelper.GetContextInformation());
+
+            var aListOfStrings = new List<string>() { "a", "b" };
+            Console.WriteLine($"DynamicSugarCore: List<string>.Format {aListOfStrings.Format()}");
+
+            var alphabetDic = DS.Resources.GetTextResource(new Regex("embed.text.txt", RegexOptions.IgnoreCase), Assembly.GetExecutingAssembly());
+            foreach (var e in alphabetDic)
+            {
+                Console.WriteLine($"DynamicSugarCore Embed Resource: key:{e.Key} value:{e.Value} ");
+            }
 
             var dataTxtFile = RuntimeHelper.GetAppFilePath("data.txt");
             Console.WriteLine($"dataTxtFile:${dataTxtFile}, exists:{File.Exists(dataTxtFile)}");

@@ -16,7 +16,7 @@ param(
     [string]$acrLoginServer = "fredcontainerregistry.azurecr.io",
 
     [Parameter(Mandatory=$false)] # The Azure Container Registry has default username which is the name of the registry, but there is a password required when pushing a image
-    [string]$azureContainerRegistryPassword = "/HMiRc",
+    [string]$azureContainerRegistryPassword = "qff7aKWqbAZ87NkXmEkiZYMLp6/HMiRc",
 
     [Parameter(Mandatory=$false)] 
     [int]$containerInstanceCpu = 1,
