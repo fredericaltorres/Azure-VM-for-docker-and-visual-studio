@@ -1,6 +1,13 @@
 # Information about doing docker container development using Visual Studio and NodeJS from an Azure VM
 
-## Azure VM
+## Table of Contents
+1. [Creation of the Azure VM](#CreationOfTheAzureVM)
+2. [Docker](#Docker)
+3. [Kubernetes](#Kubernetes)
+
+<a name="CreationOfTheAzureVM"></a>
+## Creation of the Azure VM
+
 First we need a machine, you may install docker on our physical machine, but you can also provision an Azure VM, which is what we are doing here.
 
 ### Creation
@@ -28,11 +35,11 @@ bcdedit /set hypervisorlaunchtype Auto
 # Reboot
 ```
 
+<a name="Docker"></a>
 ## Docker
 
 ### Installation
 Download and install Docker
-
 - [Install Docker Desktop for Windows](https://docs.docker.com/docker-for-windows/install)
 You will be asked to log out and log in.
 
@@ -43,14 +50,16 @@ You will be asked to log out and log in.
 - We can increase the memory allocated to the MobyLinuxVM using the Hyper-V Manager UI.
 
 #### Docker account
+You may need an account for the web site hub.docker.com.
     - Create an account http://hub.docker.com
     Login: docker login # username:usual, password:cat
 
 #### Testing local installation of Docker
 ```powershell
-    C:\>docker version # Show the docker client side and server side
+C:\>docker version # Show the docker client side and server side
 ```
 We expect the client side to be Windows and the server side to be Linux.
+
 **Output**
 ```
 Client: Docker Engine - Community
@@ -61,8 +70,8 @@ OS/Arch:          linux/amd64
 ```        
 
 ```powershell
-C:\>docker ps # At this point to container process should be running
-C:\>docker images ps # At this point to the contains repository should be enpty
+C:\>docker ps # At this point no container instance should be running 
+C:\>docker images ps # At this point to the contains repository should be empty
 ```
 
 - Let's download and execute an Hello World image
@@ -90,7 +99,7 @@ C:\>docker exec helloworld "uname" # run command uname inside the running contai
 docker stop helloworld # stop running container
 ```
 
-- download the dotnet runtime and query for information
+- Download the dotnet runtime and query for information
 ```powershell
 C:\>docker run --rm -it microsoft/C:\>dotnet:2-runtime dotnet --info
 ```
@@ -98,14 +107,16 @@ C:\>docker run --rm -it microsoft/C:\>dotnet:2-runtime dotnet --info
 - How to visualize information about a container image using the inspect tool?
 
 ```powershell
-# How to get informaton about a docker image, used tool manifest-tool from weshigbee running in a container
-C:\>docker run --rm weshigbee/manifest-tool inspect microsoft/dotnet:2-runtime
-C:\>docker run --rm weshigbee/manifest-tool inspect microsoft/dotnet:2.0.0-preview1-runtime-jessie
+# How to get informaton about a docker image
+C:\>docker inspect microsoft/dotnet:2-runtime
 ```
 
 ### How to build and a NodeJS REST API as docker container locally and in Azure
 - [Download node js](https://nodejs.org/en/download/)
-- The sub folder fNodeAppInContainer, contains a NodeJS REST API application, that be containerized, published to an Azure Container Registry, and instanciate multple time int the cloud using a PowerShell Script. 
+- The sub folder fNodeAppInContainer, contains a NodeJS REST API application, that can be 
+- Turned into a container image
+- Published to an Azure Container Registry
+- Instanciate multple time int the cloud using a PowerShell Script. 
 - [README](fNodeAppInContainer)
 
 ### Download Visual Studio and Git
@@ -117,7 +128,7 @@ C:\>docker run --rm weshigbee/manifest-tool inspect microsoft/dotnet:2.0.0-previ
 
 - [README](./DotNetCore_Cloud_Docker_Dvt/fcoreconsole/app)
 
-### Create an ASP.NET Core Web App, Rest API with Docker support (Not finished).
+### How to build and run ASP.NET Core Web App, Rest API with Docker support (Not finished).
 - Create an ASP.NET Core Web App, Rest API with Docker support.
     * Run inside IIS Express: https://localhost:44389/api/values
     * Run inside a container
@@ -142,10 +153,7 @@ docker build -f "C:\DVT\FWebApiDockerized\Dockerfile" -t fwebapidockerized:dev -
 
 ```
 
-### Publish to Azure Container Registry
-
-***` - - - Not finished - - - `***
-
+<a name="Kubernetes"></a>
 ## Kubernetes
 
 - [Azure Kubernetes Service](./AzureKubernetesService.md)
