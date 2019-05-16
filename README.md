@@ -103,21 +103,21 @@ C:\>docker run --rm weshigbee/manifest-tool inspect microsoft/dotnet:2-runtime
 C:\>docker run --rm weshigbee/manifest-tool inspect microsoft/dotnet:2.0.0-preview1-runtime-jessie
 ```
 
-## How to build and a NodeJS REST API as docker container locally and in Azure
+### How to build and a NodeJS REST API as docker container locally and in Azure
 - [Download node js](https://nodejs.org/en/download/)
 - The sub folder fNodeAppInContainer, contains a NodeJS REST API application, that be containerized, published to an Azure Container Registry, and instanciate multple time int the cloud using a PowerShell Script. 
 - [README](fNodeAppInContainer)
 
-## Download Visual Studio and Git
+### Download Visual Studio and Git
 
 - [Download Git](https://git-scm.com/download/win)
 - [Download Visual Studio 2019 Pro or Community Edition](https://www.google.com)
 
-## How to build and run a dot net core console as docker container locally and in Azure
+### How to build and run a dot net core console as docker container locally and in Azure
 
 - [README](./DotNetCore_Cloud_Docker_Dvt/fcoreconsole/app)
 
-## Create an ASP.NET Core Web App, Rest API with Docker support (Not finished).
+### Create an ASP.NET Core Web App, Rest API with Docker support (Not finished).
 - Create an ASP.NET Core Web App, Rest API with Docker support.
     * Run inside IIS Express: https://localhost:44389/api/values
     * Run inside a container
@@ -146,78 +146,6 @@ docker build -f "C:\DVT\FWebApiDockerized\Dockerfile" -t fwebapidockerized:dev -
 
 ***` - - - Not finished - - - `***
 
+## Kubernetes
 
-# Azure Kubernetes Service
-https://www.youtube.com/watch?v=MCRJSKzdDjI
-
-az aks install-cli
-
-#Need a resource group fkubernetes 
-az group create -n fkubernetes  -l eastus2
-
-# -c 2 - 2 nodes   -k Kubernete version
-az aks create -n fkubernetes -g fkubernetes -c 2 -k 1.7.7
-# A resource group named MC_fkubernetes_fkubernetes_eastus2 is created containing all resources (vm, disk, load balancer)
-
-# Get list of cluster
-az aks list -o table
-
-# Switch to cluster
-az aks get-credentials --resource-group fkubernetes --name fkubernetes
-
-kubectl get nodes # list all nodes or vm
-kubectl get pods --all-namespaces # List pods running
-
-# https://docs.microsoft.com/en-us/azure/aks/kubernetes-dashboard
-# Open dashbord to anyone, see doc above for more security
-kubectl create clusterrolebinding kubernetes-dashboard --clusterrole=cluster-admin --serviceaccount=kube-system:kubernetes-dashboard
-
-az aks browse --resource-group fkubernetes --name fkubernetes # open dashboard
-az aks browse -n fkubernetes -g fkubernetes  # open dashboard  
-
-# Set the total of node to 3 -> add one more vm
-az aks scale --resource-group fkubernetes -n fkubernetes --agent-count 3
-
-az aks get-versions --location eastus2 -o table
-
-kubectl config use-context fkubernetes # Switch to cluster
-
-# How to instanciate a container from ACR into Kubenetes
-# https://thorsten-hans.com/how-to-use-private-azure-container-registry-with-kubernetes
-# Define the ACR registry as a docker secret
-kubectl create secret docker-registry fredcontainerregistry --docker-server fredcontainerregistry.azurecr.io --docker-email fredericaltorres@gmail.com --docker-username=FredContainerRegistry --docker-password "/HMiRc"
-
-#Docker image in ACR: fredcontainerregistry.azurecr.io/fcoreconsoleazurestorage:1.0.29    
-
-Create file:pod-sample.yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: private-fcoreconsoleazurestorage
-spec:
-  containers:
-  - name: private-container-fcoreconsoleazurestorage
-    image: fredcontainerregistry.azurecr.io/fcoreconsoleazurestorage:1.0.29
-  imagePullSecrets:
-  - name: fredcontainerregistry
-
-# Run the following to create an instance of the container
-C:\>kubectl create -f pod-sample.yaml
-kubectl describe pod private-fcoreconsoleazurestorage
-
-# Delete running pod or container
-kubectl delete -f pod-sample.yaml
-
-# https://kubernetes.io/docs/reference/kubectl/cheatsheet/
-
-# Get all running pods or container in the namespace
-kubectl get pods --field-selector=status.phase=Running
-
-# Get Log
-kubectl logs private-fcoreconsoleazurestorage
-# Stream log
-kubectl logs -f private-fcoreconsoleazurestorage
-
-# Run command in pod
-kubectl exec private-fcoreconsoleazurestorage -- ls /app/tutu
-
+- [Azure Kubernetes Service](./AzureKubernetesService.md)
