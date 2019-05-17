@@ -32,7 +32,8 @@ namespace fDotNetCoreContainerHelper
             s.Append($"Common Language Runtime Version:{Environment.Version}").AppendLine();
             s.Append($"OSVersion:{Environment.OSVersion}").AppendLine();
             s.Append($"SystemDirectory:{Environment.SystemDirectory}").AppendLine();
-            
+            s.Append($"NewLine.Length:{Environment.NewLine.Length}").AppendLine();
+
             return s.ToString();
         }
 

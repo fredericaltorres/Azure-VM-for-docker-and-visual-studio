@@ -35,9 +35,7 @@ namespace DotNetCoreConsole_Container_UpdatingAzureStorage
 
             var alphabetDic = DS.Resources.GetTextResource(new Regex("embed.text.txt", RegexOptions.IgnoreCase), Assembly.GetExecutingAssembly());
             foreach (var e in alphabetDic)
-            {
                 Console.WriteLine($"DynamicSugarCore Embed Resource: key:{e.Key} value:{e.Value} ");
-            }
 
             var dataTxtFile = RuntimeHelper.GetAppFilePath("data.txt");
             Console.WriteLine($"dataTxtFile:${dataTxtFile}, exists:{File.Exists(dataTxtFile)}");
@@ -45,6 +43,7 @@ namespace DotNetCoreConsole_Container_UpdatingAzureStorage
             var tutuFolder = RuntimeHelper.GetAppFolderPath("tutu");
             Console.WriteLine($"tutuFolder:${tutuFolder}, exists:{Directory.Exists(tutuFolder)}");
 
+            // Initialize Azure storage and queue
             var storageAccount = RuntimeHelper.GetAppSettings("storage:accountName");
             var storageKey = RuntimeHelper.GetAppSettings("storage:key");
             const string containerName = "public";

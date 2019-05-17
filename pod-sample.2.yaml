@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: fcoreconsoleazurestorage2 # name to reference the instance
+spec:
+  containers:
+  - name: container-fcoreconsoleazurestorage2
+    image: fredcontainerregistry.azurecr.io/fcoreconsoleazurestorage:1.0.31
+  imagePullSecrets:
+  - name: fredcontainerregistry

@@ -1,0 +1,15 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dep_fcoreconsoleazurestorage # name to reference the instance
+  labels:
+    app: console
+    platform: dotnetcore
+    release: 2.2
+spec:
+  replicas: 2  
+  containers:
+  - name: container-fcoreconsoleazurestorage1
+    image: fredcontainerregistry.azurecr.io/fcoreconsoleazurestorage:1.0.31
+  imagePullSecrets:
+  - name: fredcontainerregistry
