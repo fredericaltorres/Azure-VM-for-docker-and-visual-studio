@@ -58,14 +58,30 @@ namespace DotNetCoreConsole_Container_UpdatingAzureStorage
                 {
                     case "help":
                         Console.WriteLine(@"fCoreConsoleAzureStorage
-clearQueue | clearStorage | dirStorage | SendMessage ""text""
-
-with no parameter, default mode uploading a blob file to storage and logging a message to queue
+clearQueue | clearStorage | dirStorage | dirQueue | getQueue | sendMessage ""text""
 ");
                         break;
                     case "clearqueue":
                         var deleteMessages = await qm.ClearAsync();
                         Console.WriteLine($"{deleteMessages.Count} deleted message");
+                        break;
+                    case "dirqueue":
+                        {
+                            var messageCount = await qm.ApproximateMessageCountAsync();
+                            Console.WriteLine($"{messageCount} messages");
+                        }
+                        break;
+                    case "getqueue":
+                        {
+                            while(true)
+                            {
+                                var m = await qm.DequeueAsync();
+                                if (m == null) break;
+                                await qm.DeleteAsync(m.Id);
+                                Console.WriteLine($"Message id:{m.Id}, body:{m.AsString}");
+                            }
+                            
+                        }
                         break;
                     case "clearstorage":
                         {
@@ -77,12 +93,11 @@ with no parameter, default mode uploading a blob file to storage and logging a m
                     case "dirstorage":
                         {
                             var blobs = await bm.DirAsync();
-                            Console.WriteLine($"Dir {blobs.Count} cloud file from storage container:{bm.ContainerName}");
-                            foreach (var b in blobs)
-                                Console.WriteLine(b);
+                            Console.WriteLine($"{blobs.Count} file(s) found in container:{bm.ContainerName}");
+                            foreach(var b in blobs)
+                                Console.WriteLine($"  {b}");
                         }
                         break;
-
                     case "sendmessage":
                         Console.WriteLine($"Sending Message:{args[1]}");
                         var messageId = await qm.EnqueueAsync(args[1]);

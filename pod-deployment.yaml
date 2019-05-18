@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: dep_fcoreconsoleazurestorage # name to reference the instance
+  name: dep_fcoreconsoleazurestorage
   labels:
     app: console
     platform: dotnetcore

@@ -68,7 +68,6 @@ namespace fAzureHelper
         public async Task<int> ApproximateMessageCountAsync()
         {
             await this._queue.FetchAttributesAsync();
-
             return this._queue.ApproximateMessageCount.HasValue ? this._queue.ApproximateMessageCount.Value : -1;
         }
 

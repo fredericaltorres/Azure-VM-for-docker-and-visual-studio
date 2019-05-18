@@ -5,6 +5,6 @@ metadata:
 spec:
   containers:
   - name: container-fcoreconsoleazurestorage1
-    image: fredcontainerregistry.azurecr.io/fcoreconsoleazurestorage:1.0.31
+    image: fredcontainerregistry.azurecr.io/fcoreconsoleazurestorage:1.0.33
   imagePullSecrets:
   - name: fredcontainerregistry

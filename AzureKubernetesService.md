@@ -17,17 +17,19 @@ c:\>az aks install-cli
 * A cluster can be created from the portal or the command line
 * A cluster cost money, becare full to delete it or shutdown the VM (AKA Pods)
 ```powershell
-az group create -n fkubernetes  -l eastus2 # Create a resource group fkubernetes
+az group create -n fkubernetes3  -l eastus2 # Create a resource group fkubernetes3
+az group create -n fkubernetes  -l eastus2 # Create a resource group fkubernetes3
 # Create the cluster
 # -c 2 - 2 nodes   -k Kubernete version
-az aks create -n fkubernetes -g fkubernetes -c 2 -k 1.7.7
+az aks create -n fkubernetes3 -g fkubernetes3 -c 2 -k 1.7.7
+az aks delete -n fkubernetes3 -g fkubernetes3
 ```
-* A resource group named MC_fkubernetes_fkubernetes_eastus2 will be created containing all resources (vm, disk, load balancer).
+* A resource group named MC_fkubernetes3_fkubernetes3_eastus2 will be created containing all resources (vm, disk, load balancer).
 
 ### More commands once the cluster is created
 ```powershell
 az aks list -o table # Get list of clusters
-az aks get-credentials --resource-group fkubernetes --name fkubernetes # Switch to cluster
+az aks get-credentials --resource-group fkubernetes3 --name fkubernetes3 # Switch to cluster
 ```
 
 #### Setup kubectl.exe
@@ -46,14 +48,14 @@ kubectl version # Get version of client and server Kubernetes
 ```powershell
 # Authorize anybody to be admin on the cluster dashboard
 C:\> kubectl create clusterrolebinding kubernetes-dashboard --clusterrole=cluster-admin --serviceaccount=kube-system:kubernetes-dashboard
-az aks browse --resource-group fkubernetes --name fkubernetes # Start web server dashboard and open in browser
-az aks browse -n fkubernetes -g fkubernetes  # open dashboard    # Start web server dashboard and open in browser
+az aks browse --resource-group fkubernetes3 --name fkubernetes3 # Start web server dashboard and open in browser
+az aks browse -n fkubernetes3 -g fkubernetes3  # open dashboard    # Start web server dashboard and open in browser
 ```
 ### Add one more vm (node)
 ```powershell
 # The cluster was created with 2 agents or node or vm, we now set the number to 3
 # The default vm configuration is used
-az aks scale --resource-group fkubernetes -n fkubernetes --agent-count 3
+az aks scale --resource-group fkubernetes3 -n fkubernetes3 --agent-count 3
 ```
 
 ```powershell
@@ -63,7 +65,7 @@ az aks get-versions --location eastus2 -o table
 
 ### Switch to a specific cluster
 ```powershell
-kubectl config use-context fkubernetes # Switch to cluster
+C:\> kubectl config use-context fkubernetes3 # Switch to cluster
 C:\> kubectl get services
 ```
 
@@ -74,7 +76,7 @@ C:\> kubectl get services
 1. Register the Azure Container Registry into the Kubernetes cluster
 ```powershell
 # Define the ACR registry as a docker secret
-C:\> kubectl create secret docker-registry fredcontainerregistry --docker-server fredcontainerregistry.azurecr.io --docker-email fredericaltorres@gmail.com --docker-username=FredContainerRegistry --docker-password "izBEjxfFrep"
+C:\> kubectl create secret docker-registry fredcontainerregistry --docker-server fredcontainerregistry.azurecr.io --docker-email fredericaltorres@gmail.com --docker-username=FredContainerRegistry --docker-password "+"
 ```
 
 1. Create a pod-sample.yaml file
@@ -90,8 +92,7 @@ spec:
     image: fredcontainerregistry.azurecr.io/fcoreconsoleazurestorage:1.0.31
   imagePullSecrets:
   - name: fredcontainerregistry
-```  
-
+```
 
 1. Execute the command to instanciate the container image into a pod
 ```powershell
@@ -119,6 +120,99 @@ C:\> kubectl delete -f pod-sample.2.yaml # Delete running pod or container
 C:\> kubectl delete pod fcoreconsoleazurestorage1 # Delete running pod or container using the name
 C:\> kubectl delete pod fcoreconsoleazurestorage2 # Delete running pod or container using the name
 ```
+
+### Kubernetes depoyment repllication controller
+
+```yaml
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: hello-rc
+spec:
+  replicas: 3
+  selector:
+    app: hello-world
+  template:
+    metadata:
+      labels:
+        app: hello-world
+    spec:
+      containers:
+      - name: hello-pod
+        image: nigelpoulton/pluralsight-docker-ci:latest
+        ports:
+        - containerPort: 8080
+```
+
+```powershell
+C:\> kubectl create -f .\hello-ReplicationController.yaml
+C:\> kubectl get rc -o wide # Get the replication controller instanciated
+C:\> kubectl get pods # Get the pods here we have 3 pods
+```
+#### Updating the state
+Increase `replicas:` to 5 and run 
+```powershell
+C:\> kubectl apply -f .\hello-ReplicationController.yaml
+C:\> kubectl get rc -o wide # Get the replication controller instanciated
+C:\> kubectl get pods # Get the pods here we have 5 pods
+```
+
+### Kubernetes services concept
+- Service is a REST object in the K8s API
+- Abstraction/proxy/Load balancer that allow to access pods from inside and outside cluster
+
+The Service and the pods use the same port number
+```
+ Service (ip, dns, port)
+    /      |     \
+    pod1  pod2  pod3
+```
+- An Endpoint object associated with the Service maintain the list of active pods.
+- Services and pods are associated via labels.
+- Service Discovery
+  * DNS based
+  * Environment variables
+
+Service file configuration: hello-svc.yaml
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-svc
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true"  
+  labels:
+    app: hello-world
+spec:
+  # ClusterIP: Stable internal cluster IP (Only inside the cluster)
+  # NodePort: Exposes the app outside of the cluster by adding a cluster wide port on top of the ClusterIP, other
+  # LoadBalancer: Integration NodePort with a cloud-based load balancers
+  type: LoadBalancer # https://docs.microsoft.com/en-us/azure/aks/concepts-network - https://docs.microsoft.com/en-us/azure/aks/internal-lb
+  ports:
+  - port: 8080 # Port exposed in the container is mapped to the nodePort
+    nodePort: 30001
+    protocol: TCP # can use UDP
+  selector:
+    app: hello-world # Must match the pod in the replication controller file
+                     # Execute `kubectl describe pods` and check Labels field
+```
+
+52.167.63.134 (kubernetes-af5f8b881792311e9aae10670a407783)
+52.167.63.134:30001
+
+```powershell
+kubectl create -f hello-svc.yaml
+kubectl get svc hello-svc
+#NAME        TYPE           CLUSTER-IP   EXTERNAL-IP   PORT(S)          AGE
+#hello-svc   LoadBalancer   10.0.57.75   <pending>     8080:30001/TCP   1m
+# Wait until the load balancer and public ip is created and configured
+#NAME        TYPE           CLUSTER-IP   EXTERNAL-IP    PORT(S)          AGE
+#hello-svc   LoadBalancer   10.0.57.75   40.70.217.83   8080:30001/TCP   2m
+#kubectl describe svc hello-svc
+
+```
+ http://40.70.217.83:8080/
+ 
 
 ### Kubernetes depoyment concept
 
