@@ -18,7 +18,8 @@ c:\>az aks install-cli
 * A cluster cost money, becare full to delete it or shutdown the VM (AKA Pods)
 ```powershell
 az group create -n fkubernetes3  -l eastus2 # Create a resource group fkubernetes3
-az group create -n fkubernetes  -l eastus2 # Create a resource group fkubernetes3
+az group delete -n fkubernetes3 # Delete the group - Always delete the Kubernetes service first
+
 # Create the cluster
 # -c 2 - 2 nodes   -k Kubernete version
 az aks create -n fkubernetes3 -g fkubernetes3 -c 2 -k 1.7.7
