@@ -1,7 +1,10 @@
 apiVersion: v1
 kind: Service
-metadata:
+metadata:  
   name: hello-svc
+  annotations:
+    # service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+    # service.beta.kubernetes.io/azure-load-balancer-mode: "aa"
   labels:
     app: hello-world
 spec:
@@ -11,9 +14,8 @@ spec:
   type: LoadBalancer # https://docs.microsoft.com/en-us/azure/aks/concepts-network - https://docs.microsoft.com/en-us/azure/aks/internal-lb
   ports:
   - port: 8080 # Port exposed in the container is mapped to the nodePort
-    nodePort: 30001
+    # nodePort: 30001
     protocol: TCP # can use UDP
   selector:
     app: hello-world # Must match the pod in the replication controller file
                      # Execute `kubectl describe pods` and check Labels field
-

@@ -17,20 +17,23 @@ c:\>az aks install-cli
 * A cluster can be created from the portal or the command line
 * A cluster cost money, becare full to delete it or shutdown the VM (AKA Pods)
 ```powershell
-az group create -n fkubernetes3  -l eastus2 # Create a resource group fkubernetes3
-az group delete -n fkubernetes3 # Delete the group - Always delete the Kubernetes service first
+az group create -n fkubernetes6  -l eastus2 # Create a resource group fkubernetes6
+az group delete -n fkubernetes6 # Delete the group - Always delete the Kubernetes service first
 
 # Create the cluster
 # -c 2 - 2 nodes   -k Kubernete version
-az aks create -n fkubernetes3 -g fkubernetes3 -c 2 -k 1.7.7
-az aks delete -n fkubernetes3 -g fkubernetes3
+az aks create help # return all parameters
+az aks create --name fkubernetes6 --resource-group fkubernetes6 --node-count 2 --kubernetes-version 1.7.7 --enable-addons monitoring --generate-ssh-keys --enable-rbac
+
+az aks delete -n fkubernetes6 -g fkubernetes6
+
 ```
-* A resource group named MC_fkubernetes3_fkubernetes3_eastus2 will be created containing all resources (vm, disk, load balancer).
+* A resource group named MC_fkubernetes6_fkubernetes6_eastus2 will be created containing all resources (vm, disk, load balancer).
 
 ### More commands once the cluster is created
 ```powershell
 az aks list -o table # Get list of clusters
-az aks get-credentials --resource-group fkubernetes3 --name fkubernetes3 # Switch to cluster
+az aks get-credentials --resource-group fkubernetes6 --name fkubernetes6 # Switch to cluster
 ```
 
 #### Setup kubectl.exe
@@ -49,14 +52,14 @@ kubectl version # Get version of client and server Kubernetes
 ```powershell
 # Authorize anybody to be admin on the cluster dashboard
 C:\> kubectl create clusterrolebinding kubernetes-dashboard --clusterrole=cluster-admin --serviceaccount=kube-system:kubernetes-dashboard
-az aks browse --resource-group fkubernetes3 --name fkubernetes3 # Start web server dashboard and open in browser
-az aks browse -n fkubernetes3 -g fkubernetes3  # open dashboard    # Start web server dashboard and open in browser
+az aks browse --resource-group fkubernetes6 --name fkubernetes6 # Start web server dashboard and open in browser
+az aks browse -n fkubernetes6 -g fkubernetes6  # open dashboard    # Start web server dashboard and open in browser
 ```
 ### Add one more vm (node)
 ```powershell
 # The cluster was created with 2 agents or node or vm, we now set the number to 3
 # The default vm configuration is used
-az aks scale --resource-group fkubernetes3 -n fkubernetes3 --agent-count 3
+az aks scale --resource-group fkubernetes6 -n fkubernetes6 --agent-count 3
 ```
 
 ```powershell
@@ -66,7 +69,7 @@ az aks get-versions --location eastus2 -o table
 
 ### Switch to a specific cluster
 ```powershell
-C:\> kubectl config use-context fkubernetes3 # Switch to cluster
+C:\> kubectl config use-context fkubernetes6 # Switch to cluster
 C:\> kubectl get services
 ```
 
@@ -77,7 +80,7 @@ C:\> kubectl get services
 1. Register the Azure Container Registry into the Kubernetes cluster
 ```powershell
 # Define the ACR registry as a docker secret
-C:\> kubectl create secret docker-registry fredcontainerregistry --docker-server fredcontainerregistry.azurecr.io --docker-email fredericaltorres@gmail.com --docker-username=FredContainerRegistry --docker-password "+"
+C:\> kubectl create secret docker-registry fredcontainerregistry --docker-server fredcontainerregistry.azurecr.io --docker-email fredericaltorres@gmail.com --docker-username=FredContainerRegistry --docker-password "PASSWORD"
 ```
 
 1. Create a pod-sample.yaml file
@@ -122,7 +125,15 @@ C:\> kubectl delete pod fcoreconsoleazurestorage1 # Delete running pod or contai
 C:\> kubectl delete pod fcoreconsoleazurestorage2 # Delete running pod or container using the name
 ```
 
-### Kubernetes depoyment repllication controller
+### Kubernetes depoyment Replication Controller
+
+before we start with the replication controller, you can test the image
+'nigelpoulton/pluralsight-docker-ci' like this
+```powershell
+docker pull nigelpoulton/pluralsight-docker-ci:latest
+docker run -p 8080:8080 nigelpoulton/pluralsight-docker-ci:latest
+# http://localhost:8080
+```
 
 ```yaml
 apiVersion: v1
@@ -178,10 +189,11 @@ Service file configuration: hello-svc.yaml
 ```yaml
 apiVersion: v1
 kind: Service
-metadata:
+metadata:  
   name: hello-svc
   annotations:
-    service.beta.kubernetes.io/azure-load-balancer-internal: "true"  
+    # service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+    # service.beta.kubernetes.io/azure-load-balancer-mode: "aa"
   labels:
     app: hello-world
 spec:
@@ -191,35 +203,97 @@ spec:
   type: LoadBalancer # https://docs.microsoft.com/en-us/azure/aks/concepts-network - https://docs.microsoft.com/en-us/azure/aks/internal-lb
   ports:
   - port: 8080 # Port exposed in the container is mapped to the nodePort
-    nodePort: 30001
+    # nodePort: 30001
     protocol: TCP # can use UDP
   selector:
     app: hello-world # Must match the pod in the replication controller file
                      # Execute `kubectl describe pods` and check Labels field
 ```
 
-52.167.63.134 (kubernetes-af5f8b881792311e9aae10670a407783)
-52.167.63.134:30001
-
 ```powershell
 kubectl create -f hello-svc.yaml
+kubectl apply -f hello-svc.yaml
 kubectl get svc hello-svc
+kubectl describe svc hello-svc
 #NAME        TYPE           CLUSTER-IP   EXTERNAL-IP   PORT(S)          AGE
 #hello-svc   LoadBalancer   10.0.57.75   <pending>     8080:30001/TCP   1m
-# Wait until the load balancer and public ip is created and configured
-#NAME        TYPE           CLUSTER-IP   EXTERNAL-IP    PORT(S)          AGE
 #hello-svc   LoadBalancer   10.0.57.75   40.70.217.83   8080:30001/TCP   2m
-#kubectl describe svc hello-svc
 
+kubectl describe svc hello-svc
+# LoadBalancer Ingress:     10.240.0.6
+
+kubectl delete svc hello-svc
 ```
- http://40.70.217.83:8080/
+Use as ip the field 'LoadBalancer Ingress'.
+http://104.208.139.13:8080
+
+#### Getting endpoint informaton
+
+```powershell
+C:\> kubectl get ep
+C:\> kubectl describe ep hello-svc
+```
+### Kubernetes deployment concept
+- Updates & rollbacks
+- Deployment wrap around Replicat Controller AKA Replica Set
+- Let's delete the previous Replication Controller
+```powershell
+C:\> kubectl delete rc hello-rc
+```
  
+Deployment file configuration: hello-svc.yaml
+```yaml
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: hello-deploy
+spec:
+  replicas: 3
+  minReadySeconds: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: hello-world
+    spec:
+      containers:
+      - name: hello-pod
+        image: nigelpoulton/pluralsight-docker-ci:latest
+        ports:
+        - containerPort: 8080
+```
 
-### Kubernetes depoyment concept
+```powershell
+kubectl create -f hello-Deployment.1.yaml
+kubectl get deployment hello-deploy
+kubectl describe deployment hello-deploy
+kubectl get ReplicaSet # Get Replica Set
+kubectl describe ReplicaSet # Get Replica Set
+```
 
- # https://devopscube.com/kubernetes-deployment-tutorial/
+```powershell
+# Change image to `nigelpoulton/pluralsight-docker-ci:edge`
+kubectl apply -f hello-Deployment.2.yaml --record
+kubectl rollout status deployment hello-deploy # Wait for the rollout to finish
+kubectl get deployment hello-deploy 
+kubectl describe deployment hello-deploy 
+kubectl rollout history deployment hello-deploy
+kubectl get ReplicaSet # Get Replica Set - Now we have 2 replica for 2 deployments 
+```
+
+Now undo the previous update
+```powershell
+kubectl rollout undo deployment hello-deploy --to-revision=1
+kubectl rollout status deployment hello-deploy # Wait for the rollout to finish
+kubectl get deploy hello-deploy
+```
+
+# https://devopscube.com/kubernetes-deployment-tutorial/
 kubectl create -f pod-deployment.yaml
-
 
 ## Kubernetes.io tutorials
 - [Interactive Tutorial - Deploying an App](https://kubernetes.io/docs/tutorials/kubernetes-basics/deploy-app/deploy-interactive/)

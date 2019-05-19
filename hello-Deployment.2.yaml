@@ -1,0 +1,22 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: hello-deploy
+spec:
+  replicas: 3
+  minReadySeconds: 10 # Wait for 10 s after new pod is up before marking it as ready and move to the next one
+  strategy: # Define how we upgrade the pod from the current version to the new one
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1 # Taking one at the time
+      maxSurge: 1 # Only have one extra pod based on the max value define in `replicas`
+  template:
+    metadata:
+      labels:
+        app: hello-world
+    spec:
+      containers:
+      - name: hello-pod
+        image: nigelpoulton/pluralsight-docker-ci:edge
+        ports:
+        - containerPort: 8080
