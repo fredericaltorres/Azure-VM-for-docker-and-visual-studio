@@ -5,7 +5,7 @@ The document describes how to start with Azure Kubernetes Service.
 
 ### Videos
 * [Azure: "Kubernetes the Easy Way" Managed Kubernetes on Azure AKS | E101](https://www.youtube.com/watch?v=MCRJSKzdDjI)
-* [kubectl Cheat Sheet](https://kubernetes.io/docs/reference/kubectl/cheatsheet/)
+* [Kubectl Cheat Sheet](https://kubernetes.io/docs/reference/kubectl/cheatsheet/)
 
 ### Setup
 * Install the Azure Kubernetes Service (aks) for the az command line
@@ -18,14 +18,16 @@ c:\>az aks install-cli
 * A cluster cost money, becare full to delete it or shutdown the VM (AKA Pods)
 ```powershell
 az group create -n fkubernetes6  -l eastus2 # Create a resource group fkubernetes6
-az group delete -n fkubernetes6 # Delete the group - Always delete the Kubernetes service first
+first
 
 # Create the cluster
 # -c 2 - 2 nodes   -k Kubernete version
 az aks create help # return all parameters
+# To be finalized
 az aks create --name fkubernetes6 --resource-group fkubernetes6 --node-count 2 --kubernetes-version 1.7.7 --enable-addons monitoring --generate-ssh-keys --enable-rbac
 
-az aks delete -n fkubernetes6 -g fkubernetes6
+az aks delete -n fkubernetes6 -g fkubernetes6 # How to delete a cluster
+az group delete -n fkubernetes6 # Delete the resource group - always delete the Kubernetes service 
 
 ```
 * A resource group named MC_fkubernetes6_fkubernetes6_eastus2 will be created containing all resources (vm, disk, load balancer).
@@ -38,7 +40,7 @@ az aks get-credentials --resource-group fkubernetes6 --name fkubernetes6 # Switc
 
 #### Setup kubectl.exe
 The Kubernetes command-line tool, kubectl, allows you to run commands against Kubernetes clusters. 
-- [Install and Set Up kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
+- [Install and setup kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
 
 ```powershell
 kubectl get nodes # Get the list all nodes or vm
@@ -60,11 +62,11 @@ az aks browse -n fkubernetes6 -g fkubernetes6  # open dashboard    # Start web s
 # The cluster was created with 2 agents or node or vm, we now set the number to 3
 # The default vm configuration is used
 az aks scale --resource-group fkubernetes6 -n fkubernetes6 --agent-count 3
-```
 
 ```powershell
 # List of version of kubernetes available and the upgrade path
 az aks get-versions --location eastus2 -o table
+kubectl version # Get version of client and server Kubernetes
 ```
 
 ### Switch to a specific cluster
@@ -125,7 +127,7 @@ C:\> kubectl delete pod fcoreconsoleazurestorage1 # Delete running pod or contai
 C:\> kubectl delete pod fcoreconsoleazurestorage2 # Delete running pod or container using the name
 ```
 
-### Kubernetes depoyment Replication Controller
+### Kubernetes the Replication Controller concept
 
 before we start with the replication controller, you can test the image
 'nigelpoulton/pluralsight-docker-ci' like this
@@ -169,7 +171,8 @@ C:\> kubectl get rc -o wide # Get the replication controller instanciated
 C:\> kubectl get pods # Get the pods here we have 5 pods
 ```
 
-### Kubernetes services concept
+### Kubernetes the Service concept
+
 - Service is a REST object in the K8s API
 - Abstraction/proxy/Load balancer that allow to access pods from inside and outside cluster
 
@@ -233,7 +236,9 @@ http://104.208.139.13:8080
 C:\> kubectl get ep
 C:\> kubectl describe ep hello-svc
 ```
-### Kubernetes deployment concept
+
+### Kubernetes the Deployment concept
+
 - Updates & rollbacks
 - Deployment wrap around Replicat Controller AKA Replica Set
 - Let's delete the previous Replication Controller
