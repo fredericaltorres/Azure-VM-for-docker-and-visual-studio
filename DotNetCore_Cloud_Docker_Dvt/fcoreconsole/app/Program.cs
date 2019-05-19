@@ -51,8 +51,18 @@ namespace DotNetCoreConsole_Container_UpdatingAzureStorage
 
             var qm = new QueueManager(storageAccount, storageKey, queueName);
             var bm = new BlobManager(storageAccount, storageKey, containerName);
+            var tm = new TableManager(storageAccount, storageKey, "FileHistory");
 
-            if(args.Length > 0)
+            //var fileLogHistoryAzureTableRecord = new FileLogHistoryAzureTableRecord {
+            //    FileName = "zizi.txt", ComputerOrigin = Environment.MachineName, CreationTime = DateTime.UtcNow 
+            //};
+            //fileLogHistoryAzureTableRecord.SetIdentification();
+            //await tm.Insert(fileLogHistoryAzureTableRecord);
+            var allRecords = await tm.GetRecords<FileLogHistoryAzureTableRecord>(Environment.MachineName);
+            var ziziRecords = await tm.GetRecords<FileLogHistoryAzureTableRecord>(Environment.MachineName, "zizi.txt",
+                new TableManager.WhereClauseExpression { Name = "ComputerOrigin", Value = Environment.MachineName });
+
+            if (args.Length > 0)
             {
                 switch(args[0].ToLowerInvariant())
                 {

@@ -6,15 +6,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.WindowsAzure.Storage.Table;
 
 namespace fAzureHelper
 {
-    public sealed class QueueMessage
-    {        
-        public string Id { get; set; }
-        public string PopReceipt { get; set; }
-        public string AsString { get; set; }
-    }
 
     /// <summary>
     /// https://docs.microsoft.com/en-us/azure/storage/queues/storage-dotnet-how-to-use-queues

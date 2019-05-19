@@ -19,7 +19,7 @@ namespace fAzureHelper
             this.ContainerName = containerName.ToLowerInvariant();
 
             this._cloudBlobClient = _storageAccount.CreateCloudBlobClient();
-            this._cloudBlobContainer = _cloudBlobClient.GetContainerReference(containerName);
+            this._cloudBlobContainer = _cloudBlobClient.GetContainerReference(containerName);            
 
             CreatePublicContainerIfNotExistsAsync(this._cloudBlobContainer).GetAwaiter().GetResult();
         }
