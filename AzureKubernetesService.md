@@ -32,22 +32,32 @@ az group delete -n fkubernetes6 # Delete the resource group - always delete the 
 ```
 * A resource group named MC_fkubernetes6_fkubernetes6_eastus2 will be created containing all resources (vm, disk, load balancer).
 
-### More commands once the cluster is created
+### Learning more about your AKS (Azure Kubernetes Service)
 ```powershell
-az aks list -o table # Get list of clusters
+az aks list -o table # Get the list of clusters
+```
+
+### Security and access to the cluster
+* Probably
+  - To apply a fine level of security access to the cluster AKS require a Azure AD.
+  - The default mode is the owner of the subscription can do every thing.
+```powershell
 az aks get-credentials --resource-group fkubernetes6 --name fkubernetes6 # Switch to cluster
 ```
 
 #### Setup kubectl.exe
+
 The Kubernetes command-line tool, kubectl, allows you to run commands against Kubernetes clusters. 
 - [Install and setup kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
 
 ```powershell
 kubectl get nodes # Get the list all nodes or vm
-kubectl get pods --all-namespaces # List pods running
+kubectl get pods --all-namespaces # List pods running in the cluster
 kubectl version # Get version of client and server Kubernetes
 ```
-### Kubernetes dashboard
+
+### Kubernetes Web Based Dashboard
+
 * Open dashbord to anyone, see doc below for more security, execute command below, this is new not well documented
 * [Access the Kubernetes web dashboard in Azure Kubernetes Service (AKS)](https://docs.microsoft.com/en-us/azure/aks/kubernetes-dashboard)
  
@@ -55,13 +65,16 @@ kubectl version # Get version of client and server Kubernetes
 # Authorize anybody to be admin on the cluster dashboard
 C:\> kubectl create clusterrolebinding kubernetes-dashboard --clusterrole=cluster-admin --serviceaccount=kube-system:kubernetes-dashboard
 az aks browse --resource-group fkubernetes6 --name fkubernetes6 # Start web server dashboard and open in browser
-az aks browse -n fkubernetes6 -g fkubernetes6  # open dashboard    # Start web server dashboard and open in browser
+az aks browse -n fkubernetes6 -g fkubernetes6  # open dashboard # Start web server dashboard and open in browser
 ```
-### Add one more vm (node)
+### Adding more node (VM) to the cluster
 ```powershell
 # The cluster was created with 2 agents or node or vm, we now set the number to 3
 # The default vm configuration is used
 az aks scale --resource-group fkubernetes6 -n fkubernetes6 --agent-count 3
+```
+
+### Kubernetes Version
 
 ```powershell
 # List of version of kubernetes available and the upgrade path
@@ -75,13 +88,18 @@ C:\> kubectl config use-context fkubernetes6 # Switch to cluster
 C:\> kubectl get services
 ```
 
-### How to instanciate a container image from an Azure Container Registry into a Kubernetes cluster
+## Kubernetes the POD concept
+
+A Kubernetes pod is a group of containers that are deployed together on the same host. 
+(Generally 1). If you frequently deploy single containers, you can generally replace the word "pod" with "container" and accurately understand the concept. [Overview of a Pod](https://coreos.com/kubernetes/docs/latest/pods.html)
+
+How to instanciate a container image from a (Azure Container) Registry into a Kubernetes cluster?
 
 * [How to use a private Azure Container Registry with Kubernetes](https://thorsten-hans.com/how-to-use-private-azure-container-registry-with-kubernetes)
 
 1. Register the Azure Container Registry into the Kubernetes cluster
 ```powershell
-# Define the ACR registry as a docker secret
+# Define the Azure Container Registry as a docker secret
 C:\> kubectl create secret docker-registry fredcontainerregistry --docker-server fredcontainerregistry.azurecr.io --docker-email fredericaltorres@gmail.com --docker-username=FredContainerRegistry --docker-password "PASSWORD"
 ```
 
@@ -127,7 +145,7 @@ C:\> kubectl delete pod fcoreconsoleazurestorage1 # Delete running pod or contai
 C:\> kubectl delete pod fcoreconsoleazurestorage2 # Delete running pod or container using the name
 ```
 
-### Kubernetes the Replication Controller concept
+## Kubernetes the Replication Controller concept
 
 before we start with the replication controller, you can test the image
 'nigelpoulton/pluralsight-docker-ci' like this
@@ -174,19 +192,21 @@ C:\> kubectl get pods # Get the pods here we have 5 pods
 ### Kubernetes the Service concept
 
 - Service is a REST object in the K8s API
-- Abstraction/proxy/Load balancer that allow to access pods from inside and outside cluster
+- Abstraction/proxy/Load balancer that allows to access pods from inside and outside cluster
 
 The Service and the pods use the same port number
 ```
  Service (ip, dns, port)
-    /      |     \
-    pod1  pod2  pod3
+     /      |     \
+    pod1   pod2  pod3
 ```
 - An Endpoint object associated with the Service maintain the list of active pods.
 - Services and pods are associated via labels.
 - Service Discovery
   * DNS based
   * Environment variables
+- Thanks to the association of one Services to PODs via label, we can switch
+from one version to another, by changing a label in the services.
 
 Service file configuration: hello-svc.yaml
 ```yaml
@@ -237,7 +257,7 @@ C:\> kubectl get ep
 C:\> kubectl describe ep hello-svc
 ```
 
-### Kubernetes the Deployment concept
+## Kubernetes the Deployment concept
 
 - Updates & rollbacks
 - Deployment wrap around Replicat Controller AKA Replica Set
@@ -291,6 +311,7 @@ kubectl get ReplicaSet # Get Replica Set - Now we have 2 replica for 2 deploymen
 ```
 
 Now undo the previous update
+
 ```powershell
 kubectl rollout undo deployment hello-deploy --to-revision=1
 kubectl rollout status deployment hello-deploy # Wait for the rollout to finish
