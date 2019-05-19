@@ -30,6 +30,7 @@ namespace fAzureHelper
         }
     }
 
+    // https://vkinfotek.com/azureqa/how-do-i-query-azure-table-storage-using-tablequery-class.html
     public class TableManager : AzureStorageBaseClass
     {
         public string TableName;

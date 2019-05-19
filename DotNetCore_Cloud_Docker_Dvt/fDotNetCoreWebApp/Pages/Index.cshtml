@@ -1,0 +1,18 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+
+    Version: @Model.TheVersion
+    <br /><br />
+
+    <b>Environment Information</b>
+    <textarea rows="20" cols="100">@Model.GetEnvironmentInfo()
+        </textarea>
+
+    <hr />
+
+</div>

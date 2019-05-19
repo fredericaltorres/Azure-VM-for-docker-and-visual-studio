@@ -17,20 +17,20 @@ c:\>az aks install-cli
 * A cluster can be created from the portal or the command line
 * A cluster cost money, becare full to delete it or shutdown the VM (AKA Pods)
 ```powershell
-az group create -n fkubernetes6  -l eastus2 # Create a resource group fkubernetes6
+az group create -n fkubernetes7  -l eastus2 # Create a resource group fkubernetes7
 first
 
 # Create the cluster
 # -c 2 - 2 nodes   -k Kubernete version
 az aks create help # return all parameters
 # To be finalized
-az aks create --name fkubernetes6 --resource-group fkubernetes6 --node-count 2 --kubernetes-version 1.7.7 --enable-addons monitoring --generate-ssh-keys --enable-rbac
+az aks create --name fkubernetes7 --resource-group fkubernetes7 --node-count 2 --kubernetes-version 1.7.7 --enable-addons monitoring --generate-ssh-keys --enable-rbac
 
-az aks delete -n fkubernetes6 -g fkubernetes6 # How to delete a cluster
-az group delete -n fkubernetes6 # Delete the resource group - always delete the Kubernetes service 
+az aks delete -n fkubernetes7 -g fkubernetes7 # How to delete a cluster
+az group delete -n fkubernetes7 # Delete the resource group - always delete the Kubernetes service 
 
 ```
-* A resource group named MC_fkubernetes6_fkubernetes6_eastus2 will be created containing all resources (vm, disk, load balancer).
+* A resource group named MC_fkubernetes7_fkubernetes7_eastus2 will be created containing all resources (vm, disk, load balancer).
 
 ### Learning more about your AKS (Azure Kubernetes Service)
 ```powershell
@@ -42,7 +42,7 @@ az aks list -o table # Get the list of clusters
   - To apply a fine level of security access to the cluster AKS require a Azure AD.
   - The default mode is the owner of the subscription can do every thing.
 ```powershell
-az aks get-credentials --resource-group fkubernetes6 --name fkubernetes6 # Switch to cluster
+az aks get-credentials --resource-group fkubernetes7 --name fkubernetes7 # Switch to cluster
 ```
 
 #### Setup kubectl.exe
@@ -64,14 +64,14 @@ kubectl version # Get version of client and server Kubernetes
 ```powershell
 # Authorize anybody to be admin on the cluster dashboard
 C:\> kubectl create clusterrolebinding kubernetes-dashboard --clusterrole=cluster-admin --serviceaccount=kube-system:kubernetes-dashboard
-az aks browse --resource-group fkubernetes6 --name fkubernetes6 # Start web server dashboard and open in browser
-az aks browse -n fkubernetes6 -g fkubernetes6  # open dashboard # Start web server dashboard and open in browser
+az aks browse --resource-group fkubernetes7 --name fkubernetes7 # Start web server dashboard and open in browser
+az aks browse -n fkubernetes7 -g fkubernetes7  # open dashboard # Start web server dashboard and open in browser
 ```
 ### Adding more node (VM) to the cluster
 ```powershell
 # The cluster was created with 2 agents or node or vm, we now set the number to 3
 # The default vm configuration is used
-az aks scale --resource-group fkubernetes6 -n fkubernetes6 --agent-count 3
+az aks scale --resource-group fkubernetes7 -n fkubernetes7 --agent-count 3
 ```
 
 ### Kubernetes Version
@@ -84,7 +84,7 @@ kubectl version # Get version of client and server Kubernetes
 
 ### Switch to a specific cluster
 ```powershell
-C:\> kubectl config use-context fkubernetes6 # Switch to cluster
+C:\> kubectl config use-context fkubernetes7 # Switch to cluster
 C:\> kubectl get services
 ```
 
@@ -248,7 +248,7 @@ kubectl describe svc hello-svc
 kubectl delete svc hello-svc
 ```
 Use as ip the field 'LoadBalancer Ingress'.
-http://104.208.139.13:8080
+http://104.211.49.78:8080
 
 #### Getting endpoint informaton
 
@@ -265,8 +265,39 @@ C:\> kubectl describe ep hello-svc
 ```powershell
 C:\> kubectl delete rc hello-rc
 ```
+
+### Creation
+
+Deployment file configuration: hello-Deployment.Creation.yaml
+```yaml
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: hello-deploy
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: hello-world
+    spec:
+      containers:
+      - name: hello-pod
+        image: nigelpoulton/pluralsight-docker-ci:latest
+        ports:
+        - containerPort: 8080
+```
+
+```powershell
+kubectl create -f hello-Deployment.Creation.yaml  --record
+kubectl get deployment hello-deploy
+kubectl describe deployment hello-deploy
+kubectl get ReplicaSet # Get Replica Set
+kubectl describe ReplicaSet # Get Replica Set
+kubectl delete deployment hello-deploy # If done we could delete the deployment
+```
  
-Deployment file configuration: hello-svc.yaml
+Deployment file configuration: hello-Deployment.Update.yaml
 ```yaml
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -292,28 +323,22 @@ spec:
         - containerPort: 8080
 ```
 
-```powershell
-kubectl create -f hello-Deployment.1.yaml
-kubectl get deployment hello-deploy
-kubectl describe deployment hello-deploy
-kubectl get ReplicaSet # Get Replica Set
-kubectl describe ReplicaSet # Get Replica Set
-```
 
 ```powershell
 # Change image to `nigelpoulton/pluralsight-docker-ci:edge`
-kubectl apply -f hello-Deployment.2.yaml --record
+kubectl apply -f hello-Deployment.Update.yaml --record
 kubectl rollout status deployment hello-deploy # Wait for the rollout to finish
 kubectl get deployment hello-deploy 
 kubectl describe deployment hello-deploy 
-kubectl rollout history deployment hello-deploy
+kubectl rollout history deployment hello-deploy # Get deployment history
 kubectl get ReplicaSet # Get Replica Set - Now we have 2 replica for 2 deployments 
 ```
 
 Now undo the previous update
 
 ```powershell
-kubectl rollout undo deployment hello-deploy --to-revision=1
+kubectl rollout history deployment hello-deploy # Get deployment history
+kubectl rollout undo deployment hello-deploy --to-revision=1 # Undo deployment 2 by restoring to deployment 1
 kubectl rollout status deployment hello-deploy # Wait for the rollout to finish
 kubectl get deploy hello-deploy
 ```

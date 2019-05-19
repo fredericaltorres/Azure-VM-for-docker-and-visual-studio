@@ -33,6 +33,7 @@ namespace fDotNetCoreContainerHelper
             s.Append($"OSVersion:{Environment.OSVersion}").AppendLine();
             s.Append($"SystemDirectory:{Environment.SystemDirectory}").AppendLine();
             s.Append($"NewLine.Length:{Environment.NewLine.Length}").AppendLine();
+            s.Append($"IsRunningContainerMode:{IsRunningContainerMode()}").AppendLine();
 
             return s.ToString();
         }
