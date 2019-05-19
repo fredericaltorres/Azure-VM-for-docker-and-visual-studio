@@ -15,11 +15,9 @@ dotnet new webapp #    Web/MVC/Razor Pages
 ```powershell
 C:\> docker build -t fdotnetcorewebapp . # Build image
 # Run locally, try http://localhost:8080
-
 C:\> docker run -d -p 8080:80 --name fdotnetcorewebapp fdotnetcorewebapp:latest
 C:\> docker stop fdotnetcorewebapp # Stop
-C:\> docker rm fdotnetcorewebapp # Remove
+ docker rm fdotnetcorewebapp # Remove
 ```
 
 ## Reference
-
