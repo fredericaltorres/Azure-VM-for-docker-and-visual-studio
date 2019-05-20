@@ -17,20 +17,20 @@ c:\>az aks install-cli
 * A cluster can be created from the portal or the command line
 * A cluster cost money, becare full to delete it or shutdown the VM (AKA Pods)
 ```powershell
-az group create -n fkubernetes7  -l eastus2 # Create a resource group fkubernetes7
+az group create -n fkubernetes2  -l eastus2 # Create a resource group fkubernetes2
 first
 
 # Create the cluster
 # -c 2 - 2 nodes   -k Kubernete version
 az aks create help # return all parameters
 # To be finalized
-az aks create --name fkubernetes7 --resource-group fkubernetes7 --node-count 2 --kubernetes-version 1.7.7 --enable-addons monitoring --generate-ssh-keys --enable-rbac
+az aks create --name fkubernetes2 --resource-group fkubernetes2 --node-count 2 --kubernetes-version 1.7.7 --enable-addons monitoring --generate-ssh-keys --enable-rbac
 
-az aks delete -n fkubernetes7 -g fkubernetes7 # How to delete a cluster
-az group delete -n fkubernetes7 # Delete the resource group - always delete the Kubernetes service 
+az aks delete -n fkubernetes2 -g fkubernetes2 # How to delete a cluster
+az group delete -n fkubernetes2 # Delete the resource group - always delete the Kubernetes service 
 
 ```
-* A resource group named MC_fkubernetes7_fkubernetes7_eastus2 will be created containing all resources (vm, disk, load balancer).
+* A resource group named MC_fkubernetes2_fkubernetes2_eastus2 will be created containing all resources (vm, disk, load balancer).
 
 ### Learning more about your AKS (Azure Kubernetes Service)
 ```powershell
@@ -42,7 +42,7 @@ az aks list -o table # Get the list of clusters
   - To apply a fine level of security access to the cluster AKS require a Azure AD.
   - The default mode is the owner of the subscription can do every thing.
 ```powershell
-az aks get-credentials --resource-group fkubernetes7 --name fkubernetes7 # Switch to cluster
+az aks get-credentials --resource-group fkubernetes2 --name fkubernetes2 # Switch to cluster
 ```
 
 #### Setup kubectl.exe
@@ -64,14 +64,14 @@ kubectl version # Get version of client and server Kubernetes
 ```powershell
 # Authorize anybody to be admin on the cluster dashboard
 C:\> kubectl create clusterrolebinding kubernetes-dashboard --clusterrole=cluster-admin --serviceaccount=kube-system:kubernetes-dashboard
-az aks browse --resource-group fkubernetes7 --name fkubernetes7 # Start web server dashboard and open in browser
-az aks browse -n fkubernetes7 -g fkubernetes7  # open dashboard # Start web server dashboard and open in browser
+az aks browse --resource-group fkubernetes2 --name fkubernetes2 # Start web server dashboard and open in browser
+az aks browse -n fkubernetes2 -g fkubernetes2  # open dashboard # Start web server dashboard and open in browser
 ```
 ### Adding more node (VM) to the cluster
 ```powershell
 # The cluster was created with 2 agents or node or vm, we now set the number to 3
 # The default vm configuration is used
-az aks scale --resource-group fkubernetes7 -n fkubernetes7 --agent-count 3
+az aks scale --resource-group fkubernetes2 -n fkubernetes2 --agent-count 3
 ```
 
 ### Kubernetes Version
@@ -84,7 +84,7 @@ kubectl version # Get version of client and server Kubernetes
 
 ### Switch to a specific cluster
 ```powershell
-C:\> kubectl config use-context fkubernetes7 # Switch to cluster
+C:\> kubectl config use-context fkubernetes2 # Switch to cluster
 C:\> kubectl get services
 ```
 
