@@ -1,14 +1,14 @@
 ﻿az aks list -o table # Get the list of clusters
 az aks get-credentials --resource-group fkubernetes2 --name fkubernetes2 # Switch to 
-
 kubectl config use-context fkubernetes2 # Switch to cluster
 
 # Define the Azure Container Registry as a docker secret
-$password = "PASSWORD"
+$password = "izBEjx"
 kubectl create secret docker-registry fredcontainerregistry --docker-server fredcontainerregistry.azurecr.io --docker-email fredericaltorres@gmail.com --docker-username=FredContainerRegistry --docker-password $password
 
 # Blue / Green Deployment
 https://www.ianlewis.org/en/bluegreen-deployments-kubernetes
+https://github.com/ivans3/kubernetes-kops-blue-green-deploy
 
 #####################################################################
 # Deployment 
@@ -29,7 +29,7 @@ kubectl get deployment fdotnetcorewebapp-deployment-1.0.2
 kubectl describe deployment fdotnetcorewebapp-deployment-1.0.2
 kubectl get ReplicaSet # Get Replica Set
 kubectl describe ReplicaSet # Get Replica Set
-kubectl delete deployment fdotnetcorewebapp-deployment # If done we could delete the deployment
+kubectl delete deployment fdotnetcorewebapp-deployment-1.0.2
 
 #####################################################################
 # Service

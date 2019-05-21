@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: fdotnetcorewebapp-deployment-1.0.2
 spec:
-  replicas: 2
+  replicas: 10
   template:
     metadata:
       labels:
