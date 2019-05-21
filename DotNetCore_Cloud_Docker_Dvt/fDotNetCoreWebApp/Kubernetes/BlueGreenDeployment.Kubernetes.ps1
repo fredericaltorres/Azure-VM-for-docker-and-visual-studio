@@ -13,7 +13,7 @@ param(
     [string]$acrLoginServer = "fredcontainerregistry.azurecr.io",
 
     [Parameter(Mandatory=$false)] # The Azure Container Registry has default username which is the name of the registry, but there is a password required when pushing a image
-    [string]$azureContainerRegistryPassword = "iz",
+    [string]$azureContainerRegistryPassword = "izBEjx",
 
 
     [Parameter(Mandatory=$false)] 
@@ -34,14 +34,22 @@ function JsonParse([string]$json) {
     return ,$jsonContent
 }
 
-function retry([string]$message, [ScriptBlock] $block, [int]$wait = 4, [int]$maxTry = 10) {
+# Execute the block of code 60 times and wait 6 seconds in between each try
+# If the block fail 60 time we will have to wait 6 minutes
+# We have a 6 minutes time out by default
+function retry([string]$message, [ScriptBlock] $block, [int]$wait = 6, [int]$maxTry = 60) { 
 
     $try = 0
+
     while($true) {
+
         Write-Host "[$try]$message" -ForegroundColor Cyan
+
         try {
-            $ok = &$block
+
+            $ok = & $block
             if($ok) {
+
                 Write-Host "[PASSED]$message" -ForegroundColor Green
                 return $true
             }
@@ -53,6 +61,7 @@ function retry([string]$message, [ScriptBlock] $block, [int]$wait = 4, [int]$max
             }
         }
         catch {            
+
             $ErrorMessage = $_.Exception.Message
             $FailedItem = $_.Exception.ItemName
             Write-Error $ErrorMessage
@@ -64,21 +73,24 @@ function retry([string]$message, [ScriptBlock] $block, [int]$wait = 4, [int]$max
 
 function kubernetes_create([string]$fileName, [int]$waitAfter = 0, [bool]$record = $false) {
 
+    $jsonParsed = $null
     if($record) {
-        kubectl create -f $fileName --record
+        $jsonParsed = JsonParse( kubectl create -f $fileName --record -o json )
     }
     else {
-        kubectl create -f $fileName
+        $jsonParsed = JsonParse( kubectl create -f $fileName  -o json )
     }    
     if($waitAfter -gt 0) {
         Start-Sleep -s $waitAfter
     }
+    return $jsonParsed
 }
 
 function kubernetes_getDeployment([string]$deploymentName) {
 
     return JsonParse( kubectl get deployment $deploymentName --output json )
 }
+
 
 function kubernetes_waitForDeployment([string]$deploymentName, [int]$wait = 3) {
     
@@ -89,10 +101,54 @@ function kubernetes_waitForDeployment([string]$deploymentName, [int]$wait = 3) {
     }
 }
 
+function kubernetes_getService([string]$serviceName) {
+
+    return JsonParse( kubectl get service $serviceName --output json )
+}
+
+function kubernetes_waitForService([string]$serviceName, [int]$wait = 3) {
+    
+    retry "Waiting for service:$serviceName" {
+
+        $serviceInfo = kubernetes_getService $serviceName
+        return ( $serviceInfo.status.loadBalancer.ingress -ne $null )
+    }
+}
+
+function kubernetes_GetServiceLoadBalancerIP([string]$serviceName) {
+    
+    $serviceInfo = kubernetes_getService $serviceName
+
+    if( $serviceInfo.status.loadBalancer.ingress -ne $null ) {
+
+        if( $serviceInfo.status.loadBalancer.ingress.length -gt 0 ) {
+
+            return $serviceInfo.status.loadBalancer.ingress[0].ip
+        }
+    }
+    return $null
+}
+
 function kubernetes_createDeployment([string]$fileName, [int]$waitAfter = 0, [bool]$record = $false) {
 
-    Write-Host-Color "Deploy $fileName"
-    kubernetes_create $fileName $waitAfter $record
+    Write-Host-Color "Deployment $fileName"
+    $jsonParsed = kubernetes_create $fileName $waitAfter $record
+    Write-Host-Color "Service name:$($jsonParsed.metadata.name)"
+    return $jsonParsed.metadata.name
+}
+
+function kubernetes_createService([string]$fileName, [int]$waitAfter = 0, [bool]$record = $false) {
+
+    Write-Host-Color "Service $fileName"
+    $jsonParsed = kubernetes_create $fileName $waitAfter $record
+    Write-Host-Color "Service name:$($jsonParsed.metadata.name)"
+    return $jsonParsed.metadata.name
+}
+
+
+function kubernetes_getAllClusterInfo() {
+
+    return JsonParse ( az aks list -o json )
 }
 
 function kubernetes_init($kubernetesInstanceName) {
@@ -119,17 +175,23 @@ switch($action) {
     initialDeployment { 
         
         Write-Host-Color "Deploy initial deployment"
-        $ks = JsonParse ( az aks list -o json )
+
+        $ks = kubernetes_getAllClusterInfo
         $k = $ks[0]
         $kubernetesInstanceName = $k.name
-        "Kubernetes Cluster name:$($kubernetesInstanceName), $($k.agentPoolProfiles.count) agents, os:$($k.agentPoolProfiles.osType)"
+        Write-Host-Color "Kubernetes Cluster name:$($kubernetesInstanceName), $($k.agentPoolProfiles.count) agents, os:$($k.agentPoolProfiles.osType)"
 
-        #kubernetes_init $kubernetesInstanceName
-        #kubernetes_createDeployment "Deployment.Create.v1.0.2.yaml" -waitAfter 5
+        kubernetes_init $kubernetesInstanceName
+        $deploymentName = kubernetes_createDeployment "Deployment.Create.v1.0.2.yaml"
+        kubernetes_waitForDeployment $deploymentName
 
-        kubernetes_waitForDeployment "fdotnetcorewebapp-deployment-1.0.2" # Initial version deploy
-        
-        Write-Host " readyReplicas:$($deploymentInfo.status.readyReplicas)" -ForegroundColor DarkYellow
+        $serviceName = kubernetes_createService "Service.v1.0.2.yaml"
+        kubernetes_waitForService $serviceName
+
+        $serviceName = "fdotnetcorewebapp-service"
+        $loadBlancerIp = kubernetes_GetServiceLoadBalancerIP $serviceName
+
+        Write-Host "LoadBalancer Ip:$($loadBlancerIp)" -ForegroundColor DarkYellow
     }
 }
 
