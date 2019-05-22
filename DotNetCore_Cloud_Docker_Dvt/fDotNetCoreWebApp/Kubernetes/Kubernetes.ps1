@@ -1,10 +1,11 @@
 ﻿az aks list -o table # Get the list of clusters
-az aks get-credentials --resource-group fkubernetes2 --name fkubernetes2 # Switch to 
-kubectl config use-context fkubernetes2 # Switch to cluster
+az aks get-credentials --resource-group fkubernetes5 --name fkubernetes5 # Switch to 
+kubectl config use-context fkubernetes5 # Switch to cluster
 
 # Define the Azure Container Registry as a docker secret
-$password = "izBEjx"
+$password = "PASSWORD"
 kubectl create secret docker-registry fredcontainerregistry --docker-server fredcontainerregistry.azurecr.io --docker-email fredericaltorres@gmail.com --docker-username=FredContainerRegistry --docker-password $password
+kubectl get secret
 
 # Blue / Green Deployment
 https://www.ianlewis.org/en/bluegreen-deployments-kubernetes
