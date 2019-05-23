@@ -16,9 +16,9 @@ class KubernetesManager {
         $this.ClusterName = $k.name
         Write-Host-Color "Kubernetes Cluster name:$($this.ClusterName), $($k.agentPoolProfiles.count) agents, os:$($k.agentPoolProfiles.osType)"
 
-        Write-Host-Color "Initializing Kubernetes Cluster:$this.ClusterName, Azure Container Registry:$acrName"
+        Write-Host-Color "Initializing Kubernetes Cluster:$($this.ClusterName), Azure Container Registry:$acrName"
 
-        az aks get-credentials --resource-group $this.ClusterName --name $this.ClusterName # Switch to 
+        az aks get-credentials --resource-group $this.ClusterName --name $this.ClusterName --overwrite-existing # Switch to 
         kubectl config use-context $this.ClusterName # Switch to cluster
 
         # Define the Azure Container Registry as a docker secret
@@ -51,6 +51,13 @@ class KubernetesManager {
         }
     }
 
+    [string] getForDeploymentInformation([string]$deploymentName) {
+    
+        $deploymentInfo = $this.getDeployment($deploymentName)
+        $r = "Deployment: $deploymentName`r`n            replicas:$($deploymentInfo.status.replicas), readyReplicas:$($deploymentInfo.status.readyReplicas), availableReplicas:$($deploymentInfo.status.availableReplicas), updatedReplicas:$($deploymentInfo.status.updatedReplicas)"
+        return $r
+    }
+
     [object] getService([string]$serviceName) {
 
         return JsonParse( kubectl get service $serviceName --output json )
@@ -65,6 +72,14 @@ class KubernetesManager {
         }
     }
 
+
+    [string] getForServiceInformation([string]$serviceName) {
+    
+        $serviceInfo = $this.getService($serviceName)
+        $r = "Service: $serviceName`r`n         type:$($serviceInfo.spec.type)"
+        return $r
+    }
+
     [string] GetServiceLoadBalancerIP([string]$serviceName) {
     
         $serviceInfo = $this.getService($serviceName)
@@ -74,6 +89,20 @@ class KubernetesManager {
             if( $serviceInfo.status.loadBalancer.ingress.length -gt 0 ) {
 
                 return $serviceInfo.status.loadBalancer.ingress[0].ip
+            }
+        }
+        return $null
+    }
+
+    [string] GetServiceLoadBalancerPort([string]$serviceName) {
+    
+        $serviceInfo = $this.getService($serviceName)
+
+        if( $serviceInfo.spec.ports -ne $null -and $serviceInfo.spec.ports.length -gt 0 ) {
+
+            if( $serviceInfo.spec.ports[0].port -ne $null ) {
+
+                return $serviceInfo.spec.ports[0].port
             }
         }
         return $null

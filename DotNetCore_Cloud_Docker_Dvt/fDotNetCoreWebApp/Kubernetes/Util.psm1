@@ -1,7 +1,6 @@
 ﻿
 function Write-Host-Color([string]$message, $color = "Cyan") {
 
-    Write-Host ""
     Write-Host $message -ForegroundColor $color
 }
 
@@ -49,6 +48,21 @@ function Retry([string]$message, [ScriptBlock] $block, [int]$wait = 6, [int]$max
     return $false
 }
 
+
+function urlMustReturnHtml($url) {
+
+    $homePage = (Invoke-RestMethod -Uri $url).ToLowerInvariant()
+    if($homePage.Contains("<html")) {
+        Write-Host-Color "Url:$url returned html" Green
+    }
+    else {
+        $m = "Url:$url does not return html" 
+        Write-Error $m
+        throw $m
+    }
+}
+
+Export-ModuleMember -Function urlMustReturnHtml
 Export-ModuleMember -Function Retry
 Export-ModuleMember -Function JsonParse
 Export-ModuleMember -Function Write-Host-Color

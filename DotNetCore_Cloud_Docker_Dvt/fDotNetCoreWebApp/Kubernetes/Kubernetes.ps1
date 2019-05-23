@@ -1,6 +1,6 @@
 ﻿az aks list -o table # Get the list of clusters
-az aks get-credentials --resource-group fkubernetes5 --name fkubernetes5 # Switch to 
-kubectl config use-context fkubernetes5 # Switch to cluster
+az aks get-credentials --resource-group fkubernetes6 --name fkubernetes6  --overwrite-existing # Switch to 
+kubectl config use-context fkubernetes6 # Switch to cluster
 
 # Define the Azure Container Registry as a docker secret
 $password = "PASSWORD"

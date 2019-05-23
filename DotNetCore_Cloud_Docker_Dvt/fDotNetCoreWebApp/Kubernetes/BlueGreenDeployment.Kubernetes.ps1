@@ -1,7 +1,7 @@
 ﻿[CmdletBinding()]
 param(
     [Parameter(Mandatory=$false)]
-    [string]$action = "initialDeployment", # build, push, instantiate, deleteInstance    
+    [string]$action = "getInfo", # getInfo, initialDeploymentBlue, deploy
 
      # Fred Azure Container Registry Information
     [Parameter(Mandatory=$false)]
@@ -12,7 +12,7 @@ param(
     [string]$acrLoginServer = "fredcontainerregistry.azurecr.io",
 
     [Parameter(Mandatory=$false)] # The Azure Container Registry has default username which is the name of the registry, but there is a password required when pushing a image
-    [string]$azureContainerRegistryPassword = "PASSWORD",
+    [string]$azureContainerRegistryPassword = "",
 
 
     [Parameter(Mandatory=$false)] 
@@ -36,23 +36,33 @@ Write-Host-Color "... " DarkYellow
 # For now pick the first cluster available
 $kubernetesManager = GetKubernetesManagerInstance $acrName $acrLoginServer $azureContainerRegistryPassword
 
-
 switch($action) {
 
-    initialDeployment { 
-        
-        Write-Host-Color "*** Deploy initial deployment ***"
+    initialDeploymentBlue { 
+        Write-Host-Color "*** Deploy initial deployment Blue ***" Blue
         
         $deploymentName = $kubernetesManager.createDeployment("Deployment.Create.v1.0.2.yaml")
         $kubernetesManager.waitForDeployment($deploymentName)
 
         $serviceName = $kubernetesManager.createService("Service.v1.0.2.yaml")
         $kubernetesManager.waitForService($serviceName)
-
         
         $loadBlancerIp = $kubernetesManager.GetServiceLoadBalancerIP($serviceName)
+        $loadBlancerPort = $kubernetesManager.GetServiceLoadBalancerPort($serviceName)
+        Write-Host-Color "LoadBalancer Ip:$($loadBlancerIp), port:$($loadBlancerPort)" DarkYellow
+        urlMustReturnHtml "http://$loadBlancerIp`:$loadBlancerPort"
+    }
 
-        Write-Host-Color "LoadBalancer Ip:$($loadBlancerIp)" DarkYellow
+    getInfo {
+
+        $deploymentName = "fdotnetcorewebapp-deployment-1.0.2"
+        Write-Host-Color $kubernetesManager.getForDeploymentInformation($deploymentName)
+
+        $serviceName = "fdotnetcorewebapp-service"
+        Write-Host-Color $kubernetesManager.getForServiceInformation($serviceName)
+
+
+      
     }
     deleteInitialDeployment {
         
