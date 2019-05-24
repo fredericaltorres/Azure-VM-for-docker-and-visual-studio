@@ -51,17 +51,48 @@ function Retry([string]$message, [ScriptBlock] $block, [int]$wait = 6, [int]$max
 
 function urlMustReturnHtml($url) {
 
-    $homePage = (Invoke-RestMethod -Uri $url).ToLowerInvariant()
-    if($homePage.Contains("<html")) {
-        Write-Host-Color "Url:$url returned html" Green
-    }
-    else {
-        $m = "Url:$url does not return html" 
-        Write-Error $m
-        throw $m
-    }
+    Retry "Verifying url:$url returns html" {
+
+        $homePage = (Invoke-RestMethod -Uri $url).ToLowerInvariant()
+        if($homePage.Contains("<html")) {
+            Write-Host-Color "Url:$url returned html" Green
+            return $true
+        }
+        else {
+            $m = "Url:$url does not return html" 
+            Write-Error $m
+            return $false
+        }
+    } -wait 10 -maxTry 3
 }
 
+<#
+$context = @{
+    ENVIRONMENT = "prod";
+    APP_VERSION = "1.0.2"
+}
+#>
+
+
+function processFile($context, $fileName, $newFileName = $null) {
+
+    $content = Get-Content $fileName
+    if($newFileName -eq $null) {
+
+        $newFileName = [System.IO.Path]::Combine($env:TEMP, [System.IO.Path]::GetFileName($fileName))
+    }
+
+    foreach($key in $context.keys) {
+
+        $value = $context[$key]
+        $content = $content.Replace("`${$key}", $value)
+    }
+    $content | Set-Content $newFileName | Out-Null
+    return $newFileName
+}
+
+
+Export-ModuleMember -Function processFile
 Export-ModuleMember -Function urlMustReturnHtml
 Export-ModuleMember -Function Retry
 Export-ModuleMember -Function JsonParse

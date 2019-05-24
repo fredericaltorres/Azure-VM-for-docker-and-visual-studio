@@ -9,14 +9,14 @@ class KubernetesManager {
 
     KubernetesManager($acrName, $acrLoginServer, $azureContainerRegistryPassword) {
    
-        Write-Host-Color "Retreiving clusters information..." DarkYellow
+        #$this.trace("Retreiving clusters information...", DarkYellow)
 
         $ks = $this.getAllClusterInfo()
         $k = $ks[0]
         $this.ClusterName = $k.name
-        Write-Host-Color "Kubernetes Cluster name:$($this.ClusterName), $($k.agentPoolProfiles.count) agents, os:$($k.agentPoolProfiles.osType)"
+        $this.trace("Kubernetes Cluster name:$($this.ClusterName), $($k.agentPoolProfiles.count) agents, os:$($k.agentPoolProfiles.osType)")
 
-        Write-Host-Color "Initializing Kubernetes Cluster:$($this.ClusterName), Azure Container Registry:$acrName"
+        $this.trace("Initializing Kubernetes Cluster:$($this.ClusterName), Azure Container Registry:$acrName")
 
         az aks get-credentials --resource-group $this.ClusterName --name $this.ClusterName --overwrite-existing # Switch to 
         kubectl config use-context $this.ClusterName # Switch to cluster
@@ -25,6 +25,18 @@ class KubernetesManager {
         kubectl create secret docker-registry ($acrName.ToLowerInvariant()) --docker-server $acrLoginServer --docker-email fredericaltorres@gmail.com --docker-username=$acrName --docker-password $azureContainerRegistryPassword
     }
 
+    [void] trace([string]$message, [string]$color) {
+
+        Write-Host-Color $message $color
+    }
+
+
+    [void] trace([string]$message) {
+
+        Write-Host-Color $message Cyan
+        # $this.trace("",Cyan)
+    }
+   
     [object] create([string]$fileName, [bool]$record) {
 
         $jsonParsed = $null
@@ -42,7 +54,7 @@ class KubernetesManager {
         return JsonParse( kubectl get deployment $deploymentName --output json )
     }
 
-    waitForDeployment([string]$deploymentName) {
+    [void] waitForDeployment([string]$deploymentName) {
     
         retry "Waiting for deployment:$deploymentName" {
 
@@ -63,7 +75,7 @@ class KubernetesManager {
         return JsonParse( kubectl get service $serviceName --output json )
     }
 
-    waitForService([string]$serviceName) {
+    [void] waitForService([string]$serviceName) {
     
         retry "Waiting for service:$serviceName" {
 
@@ -110,29 +122,30 @@ class KubernetesManager {
 
     [object] createDeployment([string]$fileName) {
 
-        Write-Host-Color "Deployment $fileName"
+        $this.trace("Deployment $fileName")
         $jsonParsed = $this.create($fileName, $true)
-        Write-Host-Color "Deployment name:$($jsonParsed.metadata.name)"
+
+        $this.trace("Deployment name:$($jsonParsed.metadata.name)")
         return $jsonParsed.metadata.name
     }
 
     [object] createService([string]$fileName) {
 
-        Write-Host-Color "Service $fileName"
+        $this.trace("Service $fileName")
         $jsonParsed = $this.create($fileName, $true)
-        Write-Host-Color "Service name:$($jsonParsed.metadata.name)"
+        $this.trace("Service name:$($jsonParsed.metadata.name)")
         return $jsonParsed.metadata.name
     }
 
-    deleteService([string]$fileName) {
+    [void] deleteService([string]$fileName) {
 
-        Write-Host-Color "Delete Service $fileName"
+        $this.trace("Delete Service $fileName")
         kubectl delete service $fileName
     }
 
-    deleteDeployment([string]$fileName) {
+    [void] deleteDeployment([string]$fileName) {
 
-        Write-Host-Color "Delete Deployment $fileName"
+        $this.trace("Delete Deployment $fileName")
         kubectl delete deployment $fileName
     }
 
