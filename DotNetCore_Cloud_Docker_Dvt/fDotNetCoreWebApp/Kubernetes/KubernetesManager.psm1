@@ -7,7 +7,7 @@ class KubernetesManager {
 
     [string] $ClusterName
 
-    KubernetesManager($acrName, $acrLoginServer, $azureContainerRegistryPassword) {
+    KubernetesManager([string]$acrName, [string]$acrLoginServer, [string]$azureContainerRegistryPassword, [bool]$firstInitialization) {
    
         #$this.trace("Retreiving clusters information...", DarkYellow)
 
@@ -18,11 +18,17 @@ class KubernetesManager {
 
         $this.trace("Initializing Kubernetes Cluster:$($this.ClusterName), Azure Container Registry:$acrName")
 
-        az aks get-credentials --resource-group $this.ClusterName --name $this.ClusterName --overwrite-existing # Switch to 
+        if($firstInitialization) {
+            az aks get-credentials --resource-group $this.ClusterName --name $this.ClusterName --overwrite-existing # Switch to 
+        }
+
         kubectl config use-context $this.ClusterName # Switch to cluster
 
-        # Define the Azure Container Registry as a docker secret
-        kubectl create secret docker-registry ($acrName.ToLowerInvariant()) --docker-server $acrLoginServer --docker-email fredericaltorres@gmail.com --docker-username=$acrName --docker-password $azureContainerRegistryPassword
+        if($firstInitialization) {
+
+            # Define the Azure Container Registry as a docker secret
+            kubectl create secret docker-registry ($acrName.ToLowerInvariant()) --docker-server $acrLoginServer --docker-email fredericaltorres@gmail.com --docker-username=$acrName --docker-password $azureContainerRegistryPassword
+        }
 
         $this.trace("")
     }
@@ -187,9 +193,9 @@ class KubernetesManager {
 
 
 # https://arcanecode.com/2016/04/05/accessing-a-powershell-class-defined-in-a-module-from-outside-a-module/
-function GetKubernetesManagerInstance($acrName, $acrLoginServer, $azureContainerRegistryPassword) {
+function GetKubernetesManagerInstance([string]$acrName, [string]$acrLoginServer, [string]$azureContainerRegistryPassword, [bool]$firstInitialization) {
 
-    return New-Object KubernetesManager -ArgumentList $acrName, $acrLoginServer, $azureContainerRegistryPassword    
+    return New-Object KubernetesManager -ArgumentList $acrName, $acrLoginServer, $azureContainerRegistryPassword, $firstInitialization
 }
 
 Export-ModuleMember -Function GetKubernetesManagerInstance

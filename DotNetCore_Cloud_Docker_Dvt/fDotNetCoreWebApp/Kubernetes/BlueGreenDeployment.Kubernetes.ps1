@@ -1,7 +1,8 @@
 ﻿[CmdletBinding()]
 param(
     [Parameter(Mandatory=$false)]
-    [string]$action = "deployToStaging", # getInfo, initialDeploymentToProd, deleteDeployments, deployToStaging, switchStagingToProd
+    [Alias('a')]
+    [string]$action = "deleteDeployments", # getInfo, initialDeploymentToProd, deleteDeployments, deployToStaging, switchStagingToProd, revertProdToPrevious
 
      # Fred Azure Container Registry Information
     [Parameter(Mandatory=$false)]
@@ -96,7 +97,7 @@ Write-Host "BlueGreenDeployment.Kubernetes " -ForegroundColor Yellow -NoNewline
 Write-HostColor "-action:$action" DarkYellow
 
 # For now pick the first cluster available
-$kubernetesManager = GetKubernetesManagerInstance $acrName $acrLoginServer $azureContainerRegistryPassword
+$kubernetesManager = GetKubernetesManagerInstance $acrName $acrLoginServer $azureContainerRegistryPassword ($action -eq "initialDeploymentToProd")
 
 
 switch($action) {
@@ -118,6 +119,11 @@ switch($action) {
         # Make the production service/lodBalancer from prod point to the pods of the new version
         $context = @{ ENVIRONMENT = "prod"; APP_VERSION = "1.0.3" }
         switchProductionToVersion $context "`r`n*** Switch $($context.ENVIRONMENT) to version v$($context.APP_VERSION) ***"
+    }
+
+    revertProdToPrevious {
+        $context = @{ ENVIRONMENT = "prod"; APP_VERSION = "1.0.2" }
+        switchProductionToVersion $context "`r`n*** Revert $($context.ENVIRONMENT) to version v$($context.APP_VERSION) ***"
     }
 
     getInfo {
