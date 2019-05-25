@@ -1,5 +1,6 @@
 ﻿
-function Write-Host-Color([string]$message, $color = "Cyan") {
+
+function Write-HostColor([string]$message, $color = "Cyan") {
 
     Write-Host $message -ForegroundColor $color
 }
@@ -17,16 +18,18 @@ function Retry([string]$message, [ScriptBlock] $block, [int]$wait = 6, [int]$max
 
     $try = 0
 
+    Write-Host "$message" -ForegroundColor Cyan -NoNewline
+
     while($true) {
 
-        Write-Host "[$try]$message" -ForegroundColor Cyan
+        Write-Host "." -ForegroundColor Cyan -NoNewline
 
         try {
 
             $ok = & $block
             if($ok) {
 
-                Write-Host "[PASSED]$message" -ForegroundColor Green
+                Write-Host "`r`n[PASSED]$message`r`n" -ForegroundColor Green
                 return $true
             }
             Start-Sleep -s $wait
@@ -55,7 +58,7 @@ function urlMustReturnHtml($url) {
 
         $homePage = (Invoke-RestMethod -Uri $url).ToLowerInvariant()
         if($homePage.Contains("<html")) {
-            Write-Host-Color "Url:$url returned html" Green
+            Write-HostColor "Url:$url returned html" Green
             return $true
         }
         else {
@@ -96,4 +99,4 @@ Export-ModuleMember -Function processFile
 Export-ModuleMember -Function urlMustReturnHtml
 Export-ModuleMember -Function Retry
 Export-ModuleMember -Function JsonParse
-Export-ModuleMember -Function Write-Host-Color
+Export-ModuleMember -Function Write-HostColor

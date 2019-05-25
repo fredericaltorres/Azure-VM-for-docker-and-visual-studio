@@ -1,7 +1,7 @@
 ﻿[CmdletBinding()]
 param(
     [Parameter(Mandatory=$false)]
-    [string]$action = "initialDeploymentBlue", # getInfo, initialDeploymentBlue, deleteInitialDeploymentBlue, DeploymentGreen
+    [string]$action = "deployToStaging", # getInfo, initialDeploymentToProd, deleteDeployments, deployToStaging, switchStagingToProd
 
      # Fred Azure Container Registry Information
     [Parameter(Mandatory=$false)]
@@ -12,11 +12,35 @@ param(
     [string]$acrLoginServer = "fredcontainerregistry.azurecr.io",
 
     [Parameter(Mandatory=$false)] # The Azure Container Registry has default username which is the name of the registry, but there is a password required when pushing a image
-    [string]$azureContainerRegistryPassword = "",
+    [string]$azureContainerRegistryPassword = "izBEjxfFrepl+",
 	
     [Parameter(Mandatory=$false)] 
     [bool]$clearScreen = $true
 )
+
+<#
+    Blue Green Deployment
+    1) Initial deployment Blue/Prod
+        Pods Deployment label $context = @{ ENVIRONMENT = "prod"; APP_VERSION = "1.0.2" }
+          labels:
+            app: fdotnetcorewebapp, version: 1.0.2
+        Services
+            metadata:  
+              name: fdotnetcorewebapp-service-prod
+              labels:
+                app: fdotnetcorewebapp, version: 1.0.2
+
+    2) Initial deployment Green/Staging
+          labels:
+            app: fdotnetcorewebapp, version: 1.0.3
+        Services
+            metadata:  
+              name: fdotnetcorewebapp-service-staging
+              labels:
+                app: fdotnetcorewebapp, version: 1.0.3
+
+
+#>
 
 # https://docs.microsoft.com/en-us/azure/container-registry/container-registry-auth-aks
 #az acr show --name $acrName --resource-group $myResourceGroup --query "id" --output tsv
@@ -26,6 +50,41 @@ Import-Module ".\Util.psm1" -Force
 Import-Module ".\KubernetesManager.psm1" -Force
 
 
+function deployRelease($context, $message) {
+
+    Write-HostColor $message DarkYellow
+
+    # Deploy the web app fdotnetcorewebapp from docker image on 3 pods
+    $processedFile = processFile $context ".\Templates\Deployment.{Params}.yaml"
+    $deploymentName = $kubernetesManager.createDeployment($processedFile)
+    $kubernetesManager.waitForDeployment($deploymentName)
+
+    # Deploy service/loadBalancer for the 3 pods
+    $processedFile = processFile $context ".\Templates\Service.{Params}.yaml"
+    $serviceName = $kubernetesManager.createService($processedFile)
+    $kubernetesManager.waitForService($serviceName)
+    
+    $waitTime = 30
+    Write-HostColor "Waiting $waitTime seconds before testing the web site home url"
+    Start-Sleep -s $waitTime # I noticed that it takes some time for the machine to be ready
+
+    # Retreive ip + port and verify home url
+    $loadBlancerIp = $kubernetesManager.GetServiceLoadBalancerIP($serviceName)
+    $loadBlancerPort = $kubernetesManager.GetServiceLoadBalancerPort($serviceName)
+    Write-HostColor "LoadBalancer Ip:$($loadBlancerIp), port:$($loadBlancerPort)" DarkYellow
+    urlMustReturnHtml "http://$loadBlancerIp`:$loadBlancerPort"
+}
+
+function switchProductionToVersion($context, $message) {
+
+    Write-HostColor $message DarkYellow
+
+    $processedFile = processFile $context ".\Templates\Service.{Params}.yaml"
+    $serviceName = $kubernetesManager.applyService($processedFile)
+    $kubernetesManager.waitForService($serviceName)
+}
+
+
 if($clearScreen) {
     cls
 }
@@ -33,14 +92,8 @@ else {
     Write-Host "" 
 }
 
-Write-Host-Color "BlueGreenDeployment.Kubernetes -Action:$action" Yellow
-Write-Host-Color "... " DarkYellow
-
-$context = @{
-    ENVIRONMENT = "prod";
-    APP_VERSION = "1.0.2"
-}
-
+Write-Host "BlueGreenDeployment.Kubernetes " -ForegroundColor Yellow -NoNewline
+Write-HostColor "-action:$action" DarkYellow
 
 # For now pick the first cluster available
 $kubernetesManager = GetKubernetesManagerInstance $acrName $acrLoginServer $azureContainerRegistryPassword
@@ -48,63 +101,54 @@ $kubernetesManager = GetKubernetesManagerInstance $acrName $acrLoginServer $azur
 
 switch($action) {
 
-    initialDeploymentBlue { 
-
-        Write-Host-Color "*** Deploy initial Blue version v1.0.2 ***" Blue
+    initialDeploymentToProd { 
 
         $context = @{ ENVIRONMENT = "prod"; APP_VERSION = "1.0.2" }
-
-        $processedFile = processFile $context "Deployment.{Params}.yaml"
-        $deploymentName = $kubernetesManager.createDeployment($processedFile)
-        $kubernetesManager.waitForDeployment($deploymentName)
-
-        #$deploymentName = $kubernetesManager.createDeployment("Deployment.Create.v1.0.2.yaml")
-        #$kubernetesManager.waitForDeployment($deploymentName)
-
-        $processedFile = processFile $context "Service.{Params}.yaml"
-        $serviceName = $kubernetesManager.createService($processedFile)
-        $kubernetesManager.waitForService($serviceName)
-
-        #$serviceName = $kubernetesManager.createService("Service.v1.0.2.yaml")
-        #$kubernetesManager.waitForService($serviceName)
-        
-        $loadBlancerIp = $kubernetesManager.GetServiceLoadBalancerIP($serviceName)
-        $loadBlancerPort = $kubernetesManager.GetServiceLoadBalancerPort($serviceName)
-        Write-Host-Color "LoadBalancer Ip:$($loadBlancerIp), port:$($loadBlancerPort)" DarkYellow
-        urlMustReturnHtml "http://$loadBlancerIp`:$loadBlancerPort"
+        deployRelease $context "`r`n*** Deploy initial version v$($context.APP_VERSION) to $($context.ENVIRONMENT) ***"
     }
 
-    DeploymentGreen { 
+    deployToStaging {
 
-        Write-Host-Color "*** Deploy Green v1.0.3 ***" Green
-        
-        #$deploymentName = $kubernetesManager.createDeployment("Deployment.Create.v1.0.3.yaml")
-        #$kubernetesManager.waitForDeployment($deploymentName)
+        $context = @{ ENVIRONMENT = "staging"; APP_VERSION = "1.0.3" }
+        deployRelease $context "`r`n*** Deploy version v$($context.APP_VERSION) to $($context.ENVIRONMENT) ***"
+    }
 
-        $serviceName = $kubernetesManager.createService("Service.v1.0.3.yaml")
-        $kubernetesManager.waitForService($serviceName)
-        
-        $loadBlancerIp = $kubernetesManager.GetServiceLoadBalancerIP($serviceName)
-        $loadBlancerPort = $kubernetesManager.GetServiceLoadBalancerPort($serviceName)
-        Write-Host-Color "LoadBalancer Ip:$($loadBlancerIp), port:$($loadBlancerPort)" DarkYellow
-        urlMustReturnHtml "http://$loadBlancerIp`:$loadBlancerPort"
+    switchStagingToProd {
+
+        # Make the production service/lodBalancer from prod point to the pods of the new version
+        $context = @{ ENVIRONMENT = "prod"; APP_VERSION = "1.0.3" }
+        switchProductionToVersion $context "`r`n*** Switch $($context.ENVIRONMENT) to version v$($context.APP_VERSION) ***"
     }
 
     getInfo {
 
         $deploymentName = "fdotnetcorewebapp-deployment-1.0.2"
-        Write-Host-Color $kubernetesManager.getForDeploymentInformation($deploymentName)
+        Write-HostColor $kubernetesManager.getForDeploymentInformation($deploymentName)
 
-        $serviceName = "fdotnetcorewebapp-service"
-        Write-Host-Color $kubernetesManager.getForServiceInformation($serviceName)
+        $serviceName = "fdotnetcorewebapp-service-prod"
+        Write-HostColor $kubernetesManager.getForServiceInformation($serviceName)
+
+        $deploymentName = "fdotnetcorewebapp-deployment-1.0.3"
+        Write-HostColor $kubernetesManager.getForDeploymentInformation($deploymentName)
+
+        $serviceName = "fdotnetcorewebapp-service-staging"
+        Write-HostColor $kubernetesManager.getForServiceInformation($serviceName)
     }
 
-    deleteInitialDeploymentBlue {
+    deleteDeployments {
+
+        Write-Host "Delete all deployments"
         
         $deploymentName = "fdotnetcorewebapp-deployment-1.0.2"
         $kubernetesManager.deleteDeployment($deploymentName)
 
-        $serviceName = "fdotnetcorewebapp-service"
+        $serviceName = "fdotnetcorewebapp-service-prod"
+        $kubernetesManager.deleteService($serviceName)
+
+        $deploymentName = "fdotnetcorewebapp-deployment-1.0.3"
+        $kubernetesManager.deleteDeployment($deploymentName)
+
+        $serviceName = "fdotnetcorewebapp-service-staging"
         $kubernetesManager.deleteService($serviceName)
     }
 }

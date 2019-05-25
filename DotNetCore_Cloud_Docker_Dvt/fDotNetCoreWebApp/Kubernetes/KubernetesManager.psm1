@@ -23,28 +23,45 @@ class KubernetesManager {
 
         # Define the Azure Container Registry as a docker secret
         kubectl create secret docker-registry ($acrName.ToLowerInvariant()) --docker-server $acrLoginServer --docker-email fredericaltorres@gmail.com --docker-username=$acrName --docker-password $azureContainerRegistryPassword
+
+        $this.trace("")
     }
 
     [void] trace([string]$message, [string]$color) {
 
-        Write-Host-Color $message $color
+        Write-HostColor $message $color
     }
 
 
     [void] trace([string]$message) {
 
-        Write-Host-Color $message Cyan
-        # $this.trace("",Cyan)
+        Write-HostColor $message Cyan
     }
    
     [object] create([string]$fileName, [bool]$record) {
 
         $jsonParsed = $null
         if($record) {
+
             $jsonParsed = JsonParse( kubectl create -f $fileName --record -o json )
         }
         else {
+
             $jsonParsed = JsonParse( kubectl create -f $fileName  -o json )
+        }    
+        return $jsonParsed
+    }
+
+    [object] apply([string]$fileName, [bool]$record) {
+
+        $jsonParsed = $null
+        if($record) {
+
+            $jsonParsed = JsonParse( kubectl apply -f $fileName --record -o json )
+        }
+        else {
+
+            $jsonParsed = JsonParse( kubectl apply -f $fileName  -o json )
         }    
         return $jsonParsed
     }
@@ -88,7 +105,12 @@ class KubernetesManager {
     [string] getForServiceInformation([string]$serviceName) {
     
         $serviceInfo = $this.getService($serviceName)
-        $r = "Service: $serviceName`r`n         type:$($serviceInfo.spec.type)"
+
+        # Retreive ip + port and verify home url
+        $loadBlancerIp = $this.GetServiceLoadBalancerIP($serviceName)
+        $loadBlancerPort = $this.GetServiceLoadBalancerPort($serviceName)
+
+        $r = "Service: $serviceName`r`n         type:$($serviceInfo.spec.type), url:http://$loadBlancerIp`:$loadBlancerPort"
         return $r
     }
 
@@ -122,7 +144,7 @@ class KubernetesManager {
 
     [object] createDeployment([string]$fileName) {
 
-        $this.trace("Deployment $fileName")
+        $this.trace("Create deployment $fileName")
         $jsonParsed = $this.create($fileName, $true)
 
         $this.trace("Deployment name:$($jsonParsed.metadata.name)")
@@ -131,8 +153,16 @@ class KubernetesManager {
 
     [object] createService([string]$fileName) {
 
-        $this.trace("Service $fileName")
+        $this.trace("Create service $fileName")
         $jsonParsed = $this.create($fileName, $true)
+        $this.trace("Service name:$($jsonParsed.metadata.name)")
+        return $jsonParsed.metadata.name
+    }
+
+    [object] applyService([string]$fileName) {
+
+        $this.trace("Apply service $fileName")
+        $jsonParsed = $this.apply($fileName, $true)
         $this.trace("Service name:$($jsonParsed.metadata.name)")
         return $jsonParsed.metadata.name
     }
