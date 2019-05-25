@@ -20,4 +20,3 @@ spec:
   selector:
     app: fdotnetcorewebapp  # Must match the pod in the replication controller file
     version: ${APP_VERSION} # Execute `kubectl describe pods` and check Labels field
-                          

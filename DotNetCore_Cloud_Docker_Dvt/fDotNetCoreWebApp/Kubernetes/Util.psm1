@@ -41,11 +41,11 @@ function Retry([string]$message, [ScriptBlock] $block, [int]$wait = 6, [int]$max
             }
         }
         catch {            
-
+            Write-Output "Error:"
             $ErrorMessage = $_.Exception.Message
             $FailedItem = $_.Exception.ItemName
             Write-Error $ErrorMessage
-            break
+            Start-Sleep -s $wait
         }
     }
     return $false

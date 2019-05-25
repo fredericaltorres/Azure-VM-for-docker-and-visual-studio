@@ -79,7 +79,7 @@ class KubernetesManager {
 
     [void] waitForDeployment([string]$deploymentName) {
     
-        retry "Waiting for deployment:$deploymentName" {
+        retry "Waiting for deployment: $deploymentName" {
 
             $deploymentInfo = $this.getDeployment($deploymentName)
             return ( $deploymentInfo.status.readyReplicas -eq $deploymentInfo.status.replicas )
@@ -100,7 +100,7 @@ class KubernetesManager {
 
     [void] waitForService([string]$serviceName) {
     
-        retry "Waiting for service:$serviceName" {
+        retry "Waiting for service: $serviceName" {
 
             $serviceInfo = $this.getService($serviceName)
             return ( $serviceInfo.status.loadBalancer.ingress -ne $null )
@@ -115,8 +115,9 @@ class KubernetesManager {
         # Retreive ip + port and verify home url
         $loadBlancerIp = $this.GetServiceLoadBalancerIP($serviceName)
         $loadBlancerPort = $this.GetServiceLoadBalancerPort($serviceName)
+        $labels = $serviceInfo.metadata.labels
 
-        $r = "Service: $serviceName`r`n         type:$($serviceInfo.spec.type), url:http://$loadBlancerIp`:$loadBlancerPort"
+        $r = "Service: $serviceName`r`n         type: $($serviceInfo.spec.type), url: http://$loadBlancerIp`:$loadBlancerPort, labels: $($labels)"
         return $r
     }
 
