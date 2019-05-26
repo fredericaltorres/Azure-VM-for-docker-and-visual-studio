@@ -41,24 +41,24 @@ function Retry([string]$message, [ScriptBlock] $block, [int]$wait = 6, [int]$max
             }
         }
         catch {            
-            Write-Output "Error:"
+            Write-Output "`r`nRetry caugth an error for:$message"
             $ErrorMessage = $_.Exception.Message
             $FailedItem = $_.Exception.ItemName
             Write-Error $ErrorMessage
             Start-Sleep -s $wait
         }
     }
+    Write-Output "Retry failed and return $false for: $message"
     return $false
 }
 
 
 function urlMustReturnHtml($url) {
 
-    Retry "Verifying url:$url returns html" {
+    Retry "Verifying url: $url returns html" {
 
         $homePage = (Invoke-RestMethod -Uri $url).ToLowerInvariant()
         if($homePage.Contains("<html")) {
-            Write-HostColor "Url:$url returned html" Green
             return $true
         }
         else {

@@ -14,7 +14,10 @@ class KubernetesManager {
         $ks = $this.getAllClusterInfo()
         $k = $ks[0]
         $this.ClusterName = $k.name
-        $this.trace("Kubernetes Cluster name:$($this.ClusterName), $($k.agentPoolProfiles.count) agents, os:$($k.agentPoolProfiles.osType)")
+        
+        $this.trace("Kubernetes cluster name: $($this.ClusterName), $($k.agentPoolProfiles.count) agents, os: $($k.agentPoolProfiles.osType)")
+        $this.trace("                   version: $($k.kubernetesVersion), fqdn: $($k.fqdn)")
+        
 
         $this.trace("Initializing Kubernetes Cluster:$($this.ClusterName), Azure Container Registry:$acrName")
 
@@ -89,7 +92,10 @@ class KubernetesManager {
     [string] getForDeploymentInformation([string]$deploymentName) {
     
         $deploymentInfo = $this.getDeployment($deploymentName)
+        $labels = $deploymentInfo.metadata.labels
         $r = "Deployment: $deploymentName`r`n            replicas:$($deploymentInfo.status.replicas), readyReplicas:$($deploymentInfo.status.readyReplicas), availableReplicas:$($deploymentInfo.status.availableReplicas), updatedReplicas:$($deploymentInfo.status.updatedReplicas)"
+        $r += "                                 labels: $($labels)"
+        $labels
         return $r
     }
 

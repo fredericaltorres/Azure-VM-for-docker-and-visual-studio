@@ -5,6 +5,7 @@ using System.Linq;
 using System.IO;
 using System.Reflection;
 using System.Collections.Generic;
+using System.Collections;
 
 namespace fDotNetCoreContainerHelper
 {
@@ -34,6 +35,12 @@ namespace fDotNetCoreContainerHelper
             s.Append($"SystemDirectory:{Environment.SystemDirectory}").AppendLine();
             s.Append($"NewLine.Length:{Environment.NewLine.Length}").AppendLine();
             s.Append($"IsRunningContainerMode:{IsRunningContainerMode()}").AppendLine();
+
+
+            foreach(DictionaryEntry e in Environment.GetEnvironmentVariables())
+            {
+                s.Append($"{e.Key}:{e.Value}").AppendLine();
+            }
 
             return s.ToString();
         }

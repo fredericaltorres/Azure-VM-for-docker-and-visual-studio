@@ -14,23 +14,23 @@ Write-HostColor "Blue Green Deployment With Kubernetes, Azure CLI, Powershell De
 switch($action) {
 
     demo {
-		./BlueGreenDeployment.Kubernetes.ps1 -a initialDeploymentToProd -clearScreen $false
+		./BlueGreenDeployment.Kubernetes.ps1 -a initialDeploymentToProd -cls $false
 		pause
-		./BlueGreenDeployment.Kubernetes.ps1 -a deployToStaging -clearScreen $false
+		./BlueGreenDeployment.Kubernetes.ps1 -a deployToStaging -cls $false
 		pause
-		./BlueGreenDeployment.Kubernetes.ps1 -a getInfo -clearScreen $false
+		./BlueGreenDeployment.Kubernetes.ps1 -a getInfo -cls $false
 		pause
-		./BlueGreenDeployment.Kubernetes.ps1 -a switchStagingToProd -clearScreen $false
+		./BlueGreenDeployment.Kubernetes.ps1 -a switchStagingToProd -cls $false
 		pause
-		./BlueGreenDeployment.Kubernetes.ps1 -a getInfo -clearScreen $false
+		./BlueGreenDeployment.Kubernetes.ps1 -a getInfo -cls $false
 		pause
-		./BlueGreenDeployment.Kubernetes.ps1 -a revertProdToPrevious -clearScreen $false
+		./BlueGreenDeployment.Kubernetes.ps1 -a revertProdToPrevious -cls $false
 		pause
-		./BlueGreenDeployment.Kubernetes.ps1 -a getInfo -clearScreen $false
+		./BlueGreenDeployment.Kubernetes.ps1 -a getInfo -cls $false
 		pause		
     }
 	deleteDeployments {
-		./BlueGreenDeployment.Kubernetes.ps1 -a deleteDeployments -clearScreen $false
+		./BlueGreenDeployment.Kubernetes.ps1 -a deleteDeployments -cls $false
 	}
 }
 

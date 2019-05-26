@@ -16,6 +16,7 @@ param(
     [string]$azureContainerRegistryPassword = "izBEjxfFrepl+",
 	
     [Parameter(Mandatory=$false)] 
+	[Alias('cls')]
     [bool]$clearScreen = $true
 )
 
@@ -110,14 +111,14 @@ switch($action) {
 
     deployToStaging {
 
-        $context = @{ ENVIRONMENT = "staging"; APP_VERSION = "1.0.3" }
+        $context = @{ ENVIRONMENT = "staging"; APP_VERSION = "1.0.4" }
         deployRelease $context "`r`n*** Deploy version v$($context.APP_VERSION) to $($context.ENVIRONMENT) ***"
     }
 
     switchStagingToProd {
 
         # Make the production service/lodBalancer from prod point to the pods of the new version
-        $context = @{ ENVIRONMENT = "prod"; APP_VERSION = "1.0.3" }
+        $context = @{ ENVIRONMENT = "prod"; APP_VERSION = "1.0.4" }
         switchProductionToVersion $context "`r`n*** Switch $($context.ENVIRONMENT) to version v$($context.APP_VERSION) ***"
     }
 
@@ -134,7 +135,7 @@ switch($action) {
         $serviceName = "fdotnetcorewebapp-service-prod"
         Write-HostColor $kubernetesManager.getForServiceInformation($serviceName)
 
-        $deploymentName = "fdotnetcorewebapp-deployment-1.0.3"
+        $deploymentName = "fdotnetcorewebapp-deployment-1.0.4"
         Write-HostColor $kubernetesManager.getForDeploymentInformation($deploymentName)
 
         $serviceName = "fdotnetcorewebapp-service-staging"
