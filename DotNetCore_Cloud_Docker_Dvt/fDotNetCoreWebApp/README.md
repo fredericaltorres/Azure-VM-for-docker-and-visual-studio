@@ -2,7 +2,7 @@
 
 ## Overview
 A asp.net mvc .NET code 2.2 app, for testing different deployments and execution:
-- Localy in dockers
+- Locally in docker
 - In Azure Kubernetes Service (AKS)
 
 ## Projection Creation
