@@ -12,6 +12,8 @@ The powershell script [deployContainerToAzureContainerRegistry.ps1](./Scripts/de
 - Start one instance of the container image into Azure Container Instance
 - Stop and delete the container image instance running in Azure Container Instance
 
+## Blue/Green deployment with Kubernetes
+
 The powershell script [DemoBlueGreen.ps1](./Kubernetes/DemoBlueGreen.ps1) demonstrates a blue/green or staging/production deployment of the web application.
 1. Version 1.0.2 is deployed on 2 pods using docker image, then a load balancer 1 is setup. This is the `production` environment.
 2. Version 1.0.4 is deployed on 2 pods using docker image, then a load balancer 2 is setup. This is the `staging` environment. On the staging environment the new version can be tested.
