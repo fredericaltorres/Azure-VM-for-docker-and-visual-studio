@@ -20,37 +20,12 @@ param(
     [bool]$clearScreen = $true
 )
 
-<#
-    Blue Green Deployment
-    1) Initial deployment Blue/Prod
-        Pods Deployment label $context = @{ ENVIRONMENT = "prod"; APP_VERSION = "1.0.2" }
-          labels:
-            app: fdotnetcorewebapp, version: 1.0.2
-        Services
-            metadata:  
-              name: fdotnetcorewebapp-service-prod
-              labels:
-                app: fdotnetcorewebapp, version: 1.0.2
-
-    2) Initial deployment Green/Staging
-          labels:
-            app: fdotnetcorewebapp, version: 1.0.3
-        Services
-            metadata:  
-              name: fdotnetcorewebapp-service-staging
-              labels:
-                app: fdotnetcorewebapp, version: 1.0.3
-
-
-#>
-
 # https://docs.microsoft.com/en-us/azure/container-registry/container-registry-auth-aks
 #az acr show --name $acrName --resource-group $myResourceGroup --query "id" --output tsv
 #az acr show --name $acrName --query loginServer --output tsv
 
 Import-Module ".\Util.psm1" -Force
 Import-Module ".\KubernetesManager.psm1" -Force
-
 
 function deployRelease($context, $message) {
 
