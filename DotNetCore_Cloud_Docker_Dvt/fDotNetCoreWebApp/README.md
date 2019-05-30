@@ -6,7 +6,7 @@ An ASP.NET CORE 2.2 web application, for testing different deployments and execu
 - In Azure Kubernetes Service (AKS)
 
 ## Container Image
-The powershell script [deployContainerToAzureContainerRegistry.ps1](./Scripts/deployContainerToAzureContainerRegistry.ps1) allow to
+The powershell script [deployContainerToAzureContainerRegistry.ps1](./Scripts/deployContainerToAzureContainerRegistry.ps1) allows to
 - Build the container image in the local docker
 - Tag the image with the last version and publish the image in a Azure Container Registry
 - Start one instance of the container image into Azure Container Instance
