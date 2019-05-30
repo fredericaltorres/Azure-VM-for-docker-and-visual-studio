@@ -1,8 +1,8 @@
 # fDotNetCoreWebApp
 
 ## Overview
-A asp.net mvc .NET code 2.2 app, for testing different deployments and execution:
-- Locally in docker
+An ASP.NET CORE 2.2 web application, for testing different deployments and execution:
+- Locally in Docker
 - In Azure Kubernetes Service (AKS)
 
 ## Container Image
