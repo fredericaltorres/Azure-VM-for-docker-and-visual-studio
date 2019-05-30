@@ -7,9 +7,9 @@ An ASP.NET CORE 2.2 web application, for testing different deployments and execu
 
 ## Container Image
 The powershell script [deployContainerToAzureContainerRegistry.ps1](./Scripts/deployContainerToAzureContainerRegistry.ps1) allows to
-- Build the container image in the local docker
-- Tag the image with the last version and publish the image in a Azure Container Registry
-- Start one instance of the container image into Azure Container Instance
+- Build web app container image in the local docker
+- Tag the image with the prject version and publish the image in an Azure Container Registry
+- Start one instance of the container image running in Azure Container Instance
 - Stop and delete the container image instance running in Azure Container Instance
 
 ## Blue/Green deployment with Kubernetes
