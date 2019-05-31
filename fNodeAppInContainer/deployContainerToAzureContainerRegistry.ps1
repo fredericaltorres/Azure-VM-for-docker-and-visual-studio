@@ -78,7 +78,7 @@ switch($action) {
     instantiate {
         
         $azureLoginName = $acrName
-        $azurePassword = "/HMiRc"
+        $azurePassword = $env:azureContainerRegistryPassword
         $dnsLabel="$($containeInstanceName)dns"
 
         write-host "About to instantiate instance of container $containeInstanceName from image $imageTag"

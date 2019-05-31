@@ -26,6 +26,8 @@ az aks create help # return all parameters
 # To be finalized
 az aks create --name fkubernetes9 --resource-group fkubernetes9 --node-count 2 --kubernetes-version 1.7.7 --enable-addons monitoring --generate-ssh-keys --enable-rbac
 
+# More on how to create a AKS -> https://msdn.microsoft.com/en-us/magazine/mt846465.aspx?f=255&MSPPError=-2147217396
+
 # See https://docs.microsoft.com/en-us/cli/azure/azure-cli-configuration?view=azure-cli-latest
 # to remove the yes/no confirmation
 az aks delete -n fkubernetes9 -g fkubernetes9 # How to delete a cluster
