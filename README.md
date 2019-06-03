@@ -152,6 +152,14 @@ docker build -t fwebapidockerized --build-arg source=bin\Release\netcoreapp2.1\p
 docker build -f "C:\DVT\FWebApiDockerized\Dockerfile" -t fwebapidockerized:dev --target base --label "com.microsoft.created-by=visual-studio" "C:\DVT" 
 
 ```
+### How to clean the image repository
+
+```bash
+# Get a list of id from an image name with wild card - return an array
+$ids = docker images  "fredcontainerregistry.azurecr.io/donation.personsimulator.con*" -q
+# Delete all images from id
+$ids | ForEach-Object -Process { docker rmi $_ }
+```
 
 <a name="Kubernetes"></a>
 ## Kubernetes
