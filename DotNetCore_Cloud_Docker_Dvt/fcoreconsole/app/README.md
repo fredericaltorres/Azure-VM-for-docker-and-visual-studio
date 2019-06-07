@@ -26,7 +26,8 @@ Here are the following steps
 1. Build and debug the application locally
 1. Build the container image and run it as a local container (No debugging from visual studio was setup)
 1. Publish the container image to an Azure Container Registry
-1. Instance an container instance and execute the console
+1. Instanciate an container instance in Azure Container Instance and therefore execute the console code
+1. Check that the Azure table and queue are getting populated
 1. Delete the instance of the container 
 
 The powershell script `deployContainerToAzureContainerRegistry.ps1` can execute one of these steps.
