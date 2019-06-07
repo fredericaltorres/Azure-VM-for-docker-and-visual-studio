@@ -17,8 +17,7 @@ fCoreConsoleAzureStorage sendMessage
 fCoreConsoleAzureStorage help
 ```
 
-The main idea is to be able to send command to the console instance running in the container.
-
+The main idea is to be able to send command to the console application instance running in the container from another machine.
 
 ## Build and deployment
 
