@@ -18,7 +18,7 @@ The powershell script [DemoBlueGreen.ps1](./Kubernetes/DemoBlueGreen.ps1) demons
 1. Version 1.0.2 is deployed on 2 pods using a docker image, then a load balancer #1 is setup. This is the `production` environment.
 2. Version 1.0.4 is deployed on 2 pods using a docker image, then a seconds load balancer #2 is setup. This is the `staging` environment. On the `staging` environment the new version can be tested. Once the staging version is ready for production.
 3. The load balancer #1 is set to point to deployment of version 1.0.4, the new 1.0.4 version is now in `production`.
-4. A production issue is detected, the load balancer 1 is reset to point to deployment of version 1.0.2.
+4. A production issue is detected, the load balancer #1 is reset to point to deployment of version 1.0.2.
 
 Finally we delete both `production` and `staging` environment
 
